@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+.env
+dataset/raw_images/
+*.jpg
+*.jpeg
+*.png
+*.pt
+*.pth
+logs/*.log
+backups/
+.vscode/
+.DS_Store
