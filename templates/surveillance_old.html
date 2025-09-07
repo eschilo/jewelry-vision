@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚨 Videosorveglianza - Jewelry Vision</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            background: rgba(244, 67, 54, 0.1);
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 2px solid rgba(244, 67, 54, 0.3);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            color: #f44336;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(244, 67, 54, 0.5);
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: #ffd700;
+            color: #1a1a2e;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .control-card {
+            background: rgba(15, 52, 96, 0.8);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .control-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            border-color: #f44336;
+        }
+
+        .control-card h3 {
+            color: #f44336;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .control-btn {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: #d32f2f;
+            transform: translateY(-2px);
+        }
+
+        .control-btn.success {
+            background: #4CAF50;
+        }
+
+        .control-btn.success:hover {
+            background: #45a049;
+        }
+
+        .status-panel {
+            background: rgba(26, 26, 46, 0.8);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 2px solid rgba(244, 67, 54, 0.3);
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .status-item {
+            background: rgba(15, 52, 96, 0.6);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .status-item .icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .status-item .label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .status-item .value {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .log-panel {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            border: 1px solid rgba(244, 67, 54, 0.3);
+        }
+
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid #f44336;
+            padding-left: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-btn">← Menu Principale</a>
+    
+    <div class="container">
+        <div class="header">
+            <h1>🚨 VIDEOSORVEGLIANZA & ALLARMI</h1>
+            <p>Sistema di Detection Continuo con Human Detection</p>
+        </div>
+
+        <div class="status-panel">
+            <h3 style="color: #f44336; margin-bottom: 15px;">📊 STATUS SISTEMA</h3>
+            <div class="status-grid">
+                <div class="status-item">
+                    <div class="icon">🎯</div>
+                    <div class="label">YOLO Detection</div>
+                    <div class="value" id="yolo-status">READY</div>
+                </div>
+                <div class="status-item">
+                    <div class="icon">👤</div>
+                    <div class="label">Human Detection</div>
+                    <div class="value" id="human-status">READY</div>
+                </div>
+                <div class="status-item">
+                    <div class="icon">🔔</div>
+                    <div class="label">Alert System</div>
+                    <div class="value" id="alert-system">STANDBY</div>
+                </div>
+                <div class="status-item">
+                    <div class="icon">📷</div>
+                    <div class="label">Camera Stream</div>
+                    <div class="value" id="camera-stream">READY</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Video Stream -->
+        <div class="status-panel" style="margin-bottom: 30px;">
+            <h3 style="color: #f44336; margin-bottom: 15px;">📹 LIVE CAMERA STREAM</h3>
+            <div style="text-align: center; background: rgba(0,0,0,0.5); padding: 20px; border-radius: 10px;">
+                <img id="video-stream" src="" alt="Live Stream" style="max-width: 100%; height: 400px; background: #000; border-radius: 8px; display: none;">
+                <div id="stream-placeholder" style="width: 100%; height: 400px; background: #000; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #888; font-size: 1.2em;">
+                    📹 Stream non attivo - Clicca "AVVIA STREAM" per visualizzare
+                </div>
+                <div style="margin-top: 15px;">
+                    <button class="control-btn success" onclick="startStream()">📹 AVVIA STREAM</button>
+                    <button class="control-btn" onclick="stopStream()">⏹️ FERMA STREAM</button>
+                    <button class="control-btn" onclick="captureFrame()">📸 CATTURA FRAME</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls-grid">
+            <div class="control-card">
+                <h3>🚨 Controllo Monitoraggio</h3>
+                <p>Gestione sistema di videosorveglianza</p>
+                <button class="control-btn success" onclick="startSurveillance()">▶️ AVVIA SORVEGLIANZA</button>
+                <button class="control-btn" onclick="stopSurveillance()">⏹️ FERMA SORVEGLIANZA</button>
+                <button class="control-btn" onclick="restartSurveillance()">🔄 RIAVVIA SISTEMA</button>
+            </div>
+
+            <div class="control-card">
+                <h3>👤 Human Detection</h3>
+                <p>Riduzione falsi allarmi tramite riconoscimento persone</p>
+                <button class="control-btn success" onclick="enableHumanDetection()">✅ ABILITA HUMAN DETECTION</button>
+                <button class="control-btn" onclick="disableHumanDetection()">❌ DISABILITA HUMAN DETECTION</button>
+                <button class="control-btn" onclick="calibrateHumanDetection()">⚙️ CALIBRA SENSIBILITÀ</button>
+            </div>
+
+            <div class="control-card">
+                <h3>🔔 Sistema Allarmi</h3>
+                <p>Configurazione notifiche e allarmi</p>
+                <button class="control-btn" onclick="testAlarm()">🔊 TEST ALLARME</button>
+                <button class="control-btn" onclick="configureAlerts()">⚙️ CONFIGURA ALERT</button>
+                <button class="control-btn" onclick="viewAlertHistory()">📋 STORICO ALLARMI</button>
+            </div>
+
+            <div class="control-card">
+                <h3>📹 Gestione Video</h3>
+                <p>Visualizzazione e registrazione</p>
+                <button class="control-btn success" onclick="viewLiveStream()">📺 LIVE STREAM</button>
+                <button class="control-btn" onclick="startRecording()">🔴 AVVIA REGISTRAZIONE</button>
+                <button class="control-btn" onclick="viewRecordings()">📁 VISUALIZZA REGISTRAZIONI</button>
+            </div>
+        </div>
+
+        <div class="status-panel">
+            <h3 style="color: #f44336; margin-bottom: 15px;">📝 LOG SISTEMA</h3>
+            <div class="log-panel" id="system-logs">
+                <div class="log-entry">[12:34:56] Sistema di videosorveglianza inizializzato</div>
+                <div class="log-entry">[12:35:02] Camera connessa - Risoluzione: 1920x1080</div>
+                <div class="log-entry">[12:35:05] YOLO11 model caricato con successo</div>
+                <div class="log-entry">[12:35:08] Human detection ready</div>
+                <div class="log-entry">[12:35:10] Sistema pronto per il monitoraggio</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Funzioni streaming video
+        async function startStream() {
+            try {
+                const response = await fetch('/api/start_streaming', { method: 'POST' });
+                const data = await response.json();
+                showAlert(data.message, data.success ? 'success' : 'error');
+                
+                if (data.success) {
+                    document.getElementById('video-stream').src = '/video_feed';
+                    document.getElementById('video-stream').style.display = 'block';
+                    document.getElementById('stream-placeholder').style.display = 'none';
+                    addLogEntry('Live streaming video avviato');
+                    updateStatus('camera-stream', 'STREAMING');
+                }
+            } catch (error) {
+                showAlert('Errore avvio streaming', 'error');
+            }
+        }
+
+        async function stopStream() {
+            try {
+                const response = await fetch('/api/stop_streaming', { method: 'POST' });
+                const data = await response.json();
+                showAlert(data.message, data.success ? 'success' : 'error');
+                
+                if (data.success) {
+                    document.getElementById('video-stream').src = '';
+                    document.getElementById('video-stream').style.display = 'none';
+                    document.getElementById('stream-placeholder').style.display = 'flex';
+                    addLogEntry('Live streaming video fermato');
+                    updateStatus('camera-stream', 'READY');
+                }
+            } catch (error) {
+                showAlert('Errore stop streaming', 'error');
+            }
+        }
+
+        async function captureFrame() {
+            try {
+                const response = await fetch('/api/capture_frame', { method: 'POST' });
+                const data = await response.json();
+                showAlert(data.message, data.success ? 'success' : 'error');
+                
+                if (data.success) {
+                    addLogEntry('Frame catturato e salvato');
+                }
+            } catch (error) {
+                showAlert('Errore cattura frame', 'error');
+            }
+        }
+
+        // Funzioni controllo sorveglianza
+        async function startSurveillance() {
+            showAlert('🚨 Avvio sistema di sorveglianza...', 'info');
+            try {
+                const response = await fetch('/api/start_monitoring', { method: 'POST' });
+                const data = await response.json();
+                showAlert(data.message, data.success ? 'success' : 'error');
+                if (data.success) {
+                    updateStatus('surveillance', 'ACTIVE');
+                    addLogEntry('Sistema di sorveglianza avviato');
+                }
+            } catch (error) {
+                showAlert('Errore di connessione', 'error');
+            }
+        }
+
+        async function stopSurveillance() {
+            showAlert('⏹️ Arresto sistema di sorveglianza...', 'info');
+            try {
+                const response = await fetch('/api/stop_monitoring', { method: 'POST' });
+                const data = await response.json();
+                showAlert(data.message, data.success ? 'success' : 'error');
+                if (data.success) {
+                    updateStatus('surveillance', 'STOPPED');
+                    addLogEntry('Sistema di sorveglianza fermato');
+                }
+            } catch (error) {
+                showAlert('Errore di connessione', 'error');
+            }
+        }
+
+        function restartSurveillance() {
+            showAlert('🔄 Riavvio sistema in corso...', 'info');
+            addLogEntry('Riavvio sistema richiesto');
+        }
+
+        function enableHumanDetection() {
+            showAlert('✅ Human Detection abilitato', 'success');
+            updateStatus('human-status', 'ENABLED');
+            addLogEntry('Human Detection abilitato');
+        }
+
+        function disableHumanDetection() {
+            showAlert('❌ Human Detection disabilitato', 'warning');
+            updateStatus('human-status', 'DISABLED');
+            addLogEntry('Human Detection disabilitato');
+        }
+
+        function calibrateHumanDetection() {
+            showAlert('⚙️ Calibrazione Human Detection...', 'info');
+            addLogEntry('Calibrazione Human Detection in corso');
+        }
+
+        function testAlarm() {
+            showAlert('🔊 Test allarme eseguito!', 'warning');
+            addLogEntry('Test allarme eseguito');
+        }
+
+        function configureAlerts() {
+            showAlert('⚙️ Configurazione allarmi...', 'info');
+            addLogEntry('Accesso configurazione allarmi');
+        }
+
+        function viewAlertHistory() {
+            showAlert('📋 Apertura storico allarmi...', 'info');
+            addLogEntry('Visualizzazione storico allarmi');
+        }
+
+        function viewLiveStream() {
+            showAlert('📺 Apertura live stream...', 'info');
+            addLogEntry('Live stream aperto');
+        }
+
+        function startRecording() {
+            showAlert('🔴 Registrazione avviata!', 'success');
+            addLogEntry('Registrazione video avviata');
+        }
+
+        function viewRecordings() {
+            showAlert('📁 Apertura archivio registrazioni...', 'info');
+            addLogEntry('Accesso archivio registrazioni');
+        }
+
+        // Utility functions
+        function updateStatus(elementId, status) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = status;
+                element.className = 'value ' + (status.includes('ACTIVE') || status.includes('ENABLED') || status.includes('STREAMING') ? 'success' : 'warning');
+            }
+        }
+
+        function addLogEntry(message) {
+            const now = new Date();
+            const timestamp = now.toTimeString().slice(0, 8);
+            const logPanel = document.getElementById('system-logs');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = `[${timestamp}] ${message}`;
+            logPanel.appendChild(entry);
+            logPanel.scrollTop = logPanel.scrollHeight;
+        }
+
+        function showAlert(message, type) {
+            // Crea notifica temporanea
+            const notification = document.createElement('div');
+            notification.style.position = 'fixed';
+            notification.style.top = '20px';
+            notification.style.right = '20px';
+            notification.style.padding = '15px 25px';
+            notification.style.borderRadius = '8px';
+            notification.style.color = 'white';
+            notification.style.fontWeight = 'bold';
+            notification.style.zIndex = '2000';
+            notification.textContent = message;
+            
+            switch(type) {
+                case 'success':
+                    notification.style.background = '#4CAF50';
+                    break;
+                case 'error':
+                    notification.style.background = '#f44336';
+                    break;
+                case 'warning':
+                    notification.style.background = '#FF9800';
+                    break;
+                default:
+                    notification.style.background = '#2196F3';
+            }
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 3000);
+        }
+
+        // Inizializzazione
+        document.addEventListener('DOMContentLoaded', function() {
+            addLogEntry('Modulo Videosorveglianza caricato');
+        });
+    </script>
+</body>
+</html>

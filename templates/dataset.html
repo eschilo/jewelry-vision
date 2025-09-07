@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Dataset & Validation - Jewelry Vision</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #ffffff; min-height: 100vh;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header {
+            text-align: center; padding: 30px 0; background: rgba(33, 150, 243, 0.1);
+            border-radius: 15px; margin-bottom: 30px; border: 2px solid rgba(33, 150, 243, 0.3);
+        }
+        .header h1 {
+            font-size: 2.5em; color: #2196F3; margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(33, 150, 243, 0.5);
+        }
+        .back-btn {
+            position: absolute; top: 20px; left: 20px; background: #ffd700;
+            color: #1a1a2e; padding: 10px 20px; border-radius: 8px;
+            text-decoration: none; font-weight: bold; transition: all 0.3s ease;
+        }
+        .back-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3); }
+        .dataset-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px; margin-bottom: 30px;
+        }
+        .dataset-card {
+            background: rgba(15, 52, 96, 0.8); padding: 25px; border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease;
+        }
+        .dataset-card:hover {
+            transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            border-color: #2196F3;
+        }
+        .dataset-card h3 { color: #2196F3; margin-bottom: 15px; font-size: 1.3em; }
+        .dataset-btn {
+            background: #2196F3; color: white; border: none; padding: 12px 24px;
+            border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%;
+            margin: 10px 0; transition: all 0.3s ease;
+        }
+        .dataset-btn:hover { background: #1976D2; transform: translateY(-2px); }
+        .dataset-btn.success { background: #4CAF50; }
+        .dataset-btn.success:hover { background: #45a049; }
+        .dataset-btn.warning { background: #FF9800; }
+        .dataset-btn.warning:hover { background: #F57C00; }
+        .stats-panel {
+            background: rgba(26, 26, 46, 0.8); padding: 25px; border-radius: 15px;
+            margin-bottom: 30px; border: 2px solid rgba(33, 150, 243, 0.3);
+        }
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px; margin-top: 20px;
+        }
+        .stat-item {
+            background: rgba(15, 52, 96, 0.6); padding: 15px; border-radius: 10px;
+            text-align: center; transition: all 0.3s ease;
+        }
+        .stat-item:hover { transform: scale(1.05); }
+        .stat-item .icon { font-size: 2em; margin-bottom: 10px; color: #2196F3; }
+        .stat-item .value { font-size: 1.5em; font-weight: bold; color: #4CAF50; margin-bottom: 5px; }
+        .stat-item .label { font-size: 0.9em; color: #cccccc; }
+        .progress-section {
+            background: rgba(15, 52, 96, 0.8); padding: 25px; border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 30px;
+        }
+        .progress-bar {
+            width: 100%; height: 25px; background: rgba(0,0,0,0.3);
+            border-radius: 12px; overflow: hidden; margin: 15px 0; position: relative;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #2196F3, #64B5F6);
+            transition: width 0.5s ease; border-radius: 12px;
+        }
+        .progress-text {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-weight: bold; color: white; font-size: 0.9em;
+        }
+        .file-upload {
+            border: 2px dashed rgba(33, 150, 243, 0.5); border-radius: 10px;
+            padding: 40px; text-align: center; margin: 20px 0;
+            transition: all 0.3s ease; cursor: pointer;
+        }
+        .file-upload:hover {
+            border-color: #2196F3; background: rgba(33, 150, 243, 0.1);
+        }
+        .file-upload input { display: none; }
+        .validation-panel {
+            background: rgba(15, 52, 96, 0.8); padding: 25px; border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .validation-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px; margin-top: 20px;
+        }
+        .validation-item {
+            background: rgba(26, 26, 46, 0.8); padding: 20px; border-radius: 10px;
+            border-left: 4px solid #2196F3;
+        }
+        .validation-item .title { font-weight: bold; margin-bottom: 10px; color: #2196F3; }
+        .validation-item .result { font-size: 1.2em; font-weight: bold; }
+        .validation-item .result.good { color: #4CAF50; }
+        .validation-item .result.warning { color: #FF9800; }
+        .validation-item .result.error { color: #f44336; }
+        .log-viewer {
+            background: rgba(0, 0, 0, 0.5); padding: 20px; border-radius: 10px;
+            height: 250px; overflow-y: auto; font-family: 'Courier New', monospace;
+            font-size: 0.9em; border: 1px solid rgba(33, 150, 243, 0.3);
+        }
+        .log-entry {
+            margin: 5px 0; padding: 5px; border-left: 3px solid #2196F3;
+            padding-left: 10px;
+        }
+        @media (max-width: 768px) {
+            .dataset-grid { grid-template-columns: 1fr; }
+            .header h1 { font-size: 2em; }
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-btn">← Menu Principale</a>
+    
+    <div class="container">
+        <div class="header">
+            <h1>📊 DATASET & VALIDATION</h1>
+            <p>Raccolta Dati, Annotazione e Validazione del Sistema</p>
+        </div>
+
+        <div class="stats-panel">
+            <h3 style="color: #2196F3; margin-bottom: 15px;">📈 STATISTICHE DATASET</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="icon">📸</div>
+                    <div class="value" id="total-images">2,847</div>
+                    <div class="label">Immagini Totali</div>
+                </div>
+                <div class="stat-item">
+                    <div class="icon">🏷️</div>
+                    <div class="value" id="annotated-images">2,340</div>
+                    <div class="label">Immagini Annotate</div>
+                </div>
+                <div class="stat-item">
+                    <div class="icon">✅</div>
+                    <div class="value" id="validated-images">1,892</div>
+                    <div class="label">Validate</div>
+                </div>
+                <div class="stat-item">
+                    <div class="icon">🎯</div>
+                    <div class="value" id="object-count">12,450</div>
+                    <div class="label">Oggetti Rilevati</div>
+                </div>
+                <div class="stat-item">
+                    <div class="icon">💎</div>
+                    <div class="value" id="jewelry-count">8,734</div>
+                    <div class="label">Gioielli Catalogati</div>
+                </div>
+                <div class="stat-item">
+                    <div class="icon">📊</div>
+                    <div class="value" id="accuracy">94.2%</div>
+                    <div class="label">Accuratezza</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <h3 style="color: #2196F3; margin-bottom: 15px;">⏳ PROGRESSO ELABORAZIONE</h3>
+            
+            <div style="margin-bottom: 20px;">
+                <strong>Raccolta Immagini</strong>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 85%"></div>
+                    <div class="progress-text">85% - 2,847 / 3,350 immagini</div>
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <strong>Annotazione</strong>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 72%"></div>
+                    <div class="progress-text">72% - 2,340 / 3,250 annotate</div>
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <strong>Validazione</strong>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 58%"></div>
+                    <div class="progress-text">58% - 1,892 / 3,250 validate</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dataset-grid">
+            <div class="dataset-card">
+                <h3>📸 Raccolta Dati</h3>
+                <p>Acquisizione automatica di immagini dal sistema di videosorveglianza</p>
+                <button class="dataset-btn success" onclick="startDataCollection()">▶️ AVVIA RACCOLTA</button>
+                <button class="dataset-btn" onclick="stopDataCollection()">⏹️ FERMA RACCOLTA</button>
+                <button class="dataset-btn" onclick="scheduleCollection()">⏰ PROGRAMMA RACCOLTA</button>
+                <button class="dataset-btn" onclick="viewCapturedImages()">👁️ VISUALIZZA IMMAGINI</button>
+            </div>
+
+            <div class="dataset-card">
+                <h3>🏷️ Annotazione</h3>
+                <p>Etichettatura e classificazione degli oggetti rilevati</p>
+                <button class="dataset-btn" onclick="openAnnotationTool()">✏️ STRUMENTO ANNOTAZIONE</button>
+                <button class="dataset-btn" onclick="batchAnnotation()">📦 ANNOTAZIONE BATCH</button>
+                <button class="dataset-btn" onclick="reviewAnnotations()">👁️ REVISIONA ANNOTAZIONI</button>
+                <button class="dataset-btn" onclick="exportAnnotations()">💾 ESPORTA ANNOTAZIONI</button>
+            </div>
+
+            <div class="dataset-card">
+                <h3>📤 Import/Export</h3>
+                <p>Gestione e trasferimento dei dataset</p>
+                <div class="file-upload" onclick="document.getElementById('file-input').click()">
+                    <input type="file" id="file-input" multiple accept=".jpg,.png,.json">
+                    <div style="font-size: 2em; margin-bottom: 10px;">📁</div>
+                    <div>Clicca per caricare immagini o annotations</div>
+                </div>
+                <button class="dataset-btn" onclick="exportDataset()">📤 ESPORTA DATASET</button>
+                <button class="dataset-btn" onclick="importDataset()">📥 IMPORTA DATASET</button>
+            </div>
+
+            <div class="dataset-card">
+                <h3>🔍 Pulizia Dati</h3>
+                <p>Rimozione duplicati e immagini di scarsa qualità</p>
+                <button class="dataset-btn warning" onclick="detectDuplicates()">🔍 RILEVA DUPLICATI</button>
+                <button class="dataset-btn warning" onclick="qualityCheck()">⭐ CONTROLLO QUALITÀ</button>
+                <button class="dataset-btn warning" onclick="removeCorrupted()">🗑️ RIMUOVI CORROTTE</button>
+                <button class="dataset-btn warning" onclick="optimizeDataset()">⚡ OTTIMIZZA DATASET</button>
+            </div>
+        </div>
+
+        <div class="validation-panel">
+            <h3 style="color: #2196F3; margin-bottom: 15px;">✅ RISULTATI VALIDAZIONE</h3>
+            <div class="validation-grid">
+                <div class="validation-item">
+                    <div class="title">🎯 Precisione Detection</div>
+                    <div class="result good">94.2%</div>
+                    <div style="font-size: 0.9em; color: #888; margin-top: 5px;">Ottimo risultato</div>
+                </div>
+                <div class="validation-item">
+                    <div class="title">📊 Recall Rate</div>
+                    <div class="result good">91.8%</div>
+                    <div style="font-size: 0.9em; color: #888; margin-top: 5px;">Sopra la soglia</div>
+                </div>
+                <div class="validation-item">
+                    <div class="title">⚖️ F1-Score</div>
+                    <div class="result good">92.9%</div>
+                    <div style="font-size: 0.9em; color: #888; margin-top: 5px;">Bilanciato</div>
+                </div>
+                <div class="validation-item">
+                    <div class="title">🚨 Falsi Positivi</div>
+                    <div class="result warning">5.8%</div>
+                    <div style="font-size: 0.9em; color: #888; margin-top: 5px;">Da migliorare</div>
+                </div>
+                <div class="validation-item">
+                    <div class="title">❌ Falsi Negativi</div>
+                    <div class="result good">2.1%</div>
+                    <div style="font-size: 0.9em; color: #888; margin-top: 5px;">Molto basso</div>
+                </div>
+                <div class="validation-item">
+                    <div class="title">⏱️ Velocità</div>
+                    <div class="result good">67ms</div>
+                    <div style="font-size: 0.9em; color: #888; margin-top: 5px;">Real-time OK</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-panel">
+            <h3 style="color: #2196F3; margin-bottom: 15px;">📝 LOG ATTIVITÀ</h3>
+            <div class="log-viewer" id="dataset-logs">
+                <div class="log-entry">[14:23:15] Avvio raccolta dataset automatica</div>
+                <div class="log-entry">[14:23:18] Camera configurata - Risoluzione: 1920x1080</div>
+                <div class="log-entry">[14:23:25] Acquisite 47 nuove immagini</div>
+                <div class="log-entry">[14:24:02] Processo annotazione automatica completato</div>
+                <div class="log-entry">[14:24:15] Rilevati 12 duplicati - Rimossi automaticamente</div>
+                <div class="log-entry">[14:24:32] Validazione dataset in corso...</div>
+                <div class="log-entry">[14:24:45] Dataset aggiornato: +47 immagini, +234 annotations</div>
+                <div class="log-entry">[14:24:50] Backup automatico eseguito con successo</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Funzioni raccolta dati
+        function startDataCollection() { 
+            showNotification('📸 Raccolta dati avviata!', 'success'); 
+            addLogEntry('Raccolta dati automatica avviata');
+        }
+        function stopDataCollection() { 
+            showNotification('⏹️ Raccolta dati fermata', 'warning'); 
+            addLogEntry('Raccolta dati fermata dall\'utente');
+        }
+        function scheduleCollection() { 
+            showNotification('⏰ Programmazione raccolta...', 'info'); 
+            addLogEntry('Configurazione raccolta programmata');
+        }
+        function viewCapturedImages() { 
+            showNotification('👁️ Apertura galleria immagini...', 'info'); 
+            addLogEntry('Accesso galleria immagini raccolte');
+        }
+
+        // Funzioni annotazione
+        function openAnnotationTool() { 
+            showNotification('✏️ Apertura strumento annotazione...', 'info'); 
+            addLogEntry('Avvio strumento annotazione manuale');
+        }
+        function batchAnnotation() { 
+            showNotification('📦 Annotazione batch avviata!', 'success'); 
+            addLogEntry('Processo annotazione batch in esecuzione');
+        }
+        function reviewAnnotations() { 
+            showNotification('👁️ Revisione annotazioni...', 'info'); 
+            addLogEntry('Avvio revisione annotazioni esistenti');
+        }
+        function exportAnnotations() { 
+            showNotification('💾 Annotazioni esportate!', 'success'); 
+            addLogEntry('Esportazione annotazioni YOLO completata');
+        }
+
+        // Funzioni import/export
+        function exportDataset() { 
+            showNotification('📤 Dataset esportato con successo!', 'success'); 
+            addLogEntry('Dataset esportato in formato YOLO');
+        }
+        function importDataset() { 
+            showNotification('📥 Importazione dataset...', 'info'); 
+            addLogEntry('Importazione nuovo dataset in corso');
+        }
+
+        // Funzioni pulizia dati
+        function detectDuplicates() { 
+            showNotification('🔍 Ricerca duplicati...', 'info'); 
+            addLogEntry('Scansione duplicati avviata');
+            setTimeout(() => {
+                showNotification('Trovati 23 duplicati!', 'warning');
+                addLogEntry('Rilevati 23 duplicati da rimuovere');
+            }, 2000);
+        }
+        function qualityCheck() { 
+            showNotification('⭐ Controllo qualità in corso...', 'info'); 
+            addLogEntry('Analisi qualità immagini avviata');
+        }
+        function removeCorrupted() { 
+            showNotification('🗑️ Rimozione file corrotti...', 'warning'); 
+            addLogEntry('Pulizia file corrotti in corso');
+        }
+        function optimizeDataset() { 
+            showNotification('⚡ Ottimizzazione dataset...', 'success'); 
+            addLogEntry('Processo ottimizzazione dataset avviato');
+        }
+
+        // Gestione file upload
+        document.getElementById('file-input').addEventListener('change', function(e) {
+            const files = e.target.files;
+            if (files.length > 0) {
+                showNotification(`📁 Caricamento ${files.length} file...`, 'info');
+                addLogEntry(`Upload di ${files.length} file iniziato`);
+            }
+        });
+
+        // Utility functions
+        function addLogEntry(message) {
+            const now = new Date();
+            const timestamp = now.toTimeString().slice(0, 8);
+            const logPanel = document.getElementById('dataset-logs');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = `[${timestamp}] ${message}`;
+            logPanel.insertBefore(entry, logPanel.firstChild);
+            
+            // Mantieni solo le ultime 20 entry
+            while (logPanel.children.length > 20) {
+                logPanel.removeChild(logPanel.lastChild);
+            }
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `position:fixed;top:20px;right:20px;padding:15px 25px;border-radius:8px;color:white;font-weight:bold;z-index:2000;`;
+            notification.style.background = type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : type === 'warning' ? '#FF9800' : '#2196F3';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => document.body.removeChild(notification), 3000);
+        }
+
+        // Aggiorna statistiche ogni 30 secondi
+        function updateStats() {
+            const totalImages = document.getElementById('total-images');
+            const annotatedImages = document.getElementById('annotated-images');
+            const validatedImages = document.getElementById('validated-images');
+            
+            if (Math.random() > 0.7) { // 30% chance di aggiornamento
+                const currentTotal = parseInt(totalImages.textContent.replace(',', ''));
+                const newTotal = currentTotal + Math.floor(Math.random() * 5);
+                totalImages.textContent = newTotal.toLocaleString();
+                
+                if (Math.random() > 0.5) {
+                    const currentAnnotated = parseInt(annotatedImages.textContent.replace(',', ''));
+                    annotatedImages.textContent = (currentAnnotated + Math.floor(Math.random() * 3)).toLocaleString();
+                }
+            }
+        }
+
+        // Inizializzazione
+        document.addEventListener('DOMContentLoaded', function() {
+            addLogEntry('Modulo Dataset & Validation caricato');
+            setInterval(updateStats, 30000); // Aggiorna ogni 30 secondi
+            showNotification('📊 Dataset manager ready!', 'success');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jewelry Vision System - Menu Principale</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .title h1 {
+            font-size: 3em;
+            color: #ffffff;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .title p {
+            font-size: 1.2em;
+            color: #cccccc;
+            opacity: 0.8;
+        }
+
+        .main-content {
+            display: flex;
+            gap: 50px;
+            align-items: flex-start;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .diamond-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .diamond-center {
+            font-size: 8em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.8));
+            animation: gentle-pulse 3s ease-in-out infinite;
+            margin-bottom: 20px;
+        }
+
+        .diamond-center:hover {
+            transform: scale(1.1) rotate(5deg);
+            filter: drop-shadow(0 0 50px rgba(255, 215, 0, 1));
+        }
+
+        @keyframes gentle-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .diamond-info {
+            text-align: center;
+            color: #cccccc;
+            font-size: 1em;
+        }
+
+        .menu-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            min-width: 400px;
+            flex: 1;
+        }
+
+        .menu-item {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            padding: 25px 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            min-height: 100px;
+        }
+
+        .menu-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .menu-item:hover::before {
+            left: 100%;
+        }
+
+        .menu-item:hover {
+            transform: translateX(10px) scale(1.02);
+            border-color: rgba(255, 215, 0, 0.6);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3),
+                        0 0 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .menu-item .icon {
+            font-size: 3.5em;
+            flex-shrink: 0;
+            width: 80px;
+            text-align: center;
+        }
+
+        .menu-item .content {
+            flex: 1;
+        }
+
+        .menu-item h3 {
+            font-size: 1.8em;
+            margin-bottom: 8px;
+            color: #ffffff;
+            line-height: 1.2;
+            font-weight: 600;
+        }
+
+        .menu-item p {
+            font-size: 1.1em;
+            color: #cccccc;
+            line-height: 1.4;
+            margin: 0;
+        }
+
+        /* Colori tematici per ogni sezione */
+        .dataset:hover {
+            border-color: #2196F3;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3),
+                        0 0 20px rgba(33, 150, 243, 0.3);
+        }
+
+        .training:hover {
+            border-color: #4CAF50;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3),
+                        0 0 20px rgba(76, 175, 80, 0.3);
+        }
+
+        .surveillance:hover {
+            border-color: #FF9800;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3),
+                        0 0 20px rgba(255, 152, 0, 0.3);
+        }
+
+        .monitoring:hover {
+            border-color: #f44336;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3),
+                        0 0 20px rgba(244, 67, 54, 0.3);
+        }
+
+        .settings:hover {
+            border-color: #9C27B0;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3),
+                        0 0 20px rgba(156, 39, 176, 0.3);
+        }
+
+        .status-bar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px 25px;
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+        }
+
+        .status-info {
+            display: flex;
+            gap: 25px;
+            font-size: 0.9em;
+            align-items: center;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #4CAF50;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Responsive design */
+        @media (max-width: 1024px) {
+            .main-content {
+                flex-direction: column;
+                align-items: center;
+                gap: 30px;
+            }
+
+            .diamond-center {
+                font-size: 6em;
+            }
+
+            .menu-section {
+                min-width: auto;
+                width: 100%;
+                max-width: 600px;
+            }
+
+            .title h1 { font-size: 2.5em; }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+
+            .diamond-center {
+                font-size: 5em;
+            }
+
+            .menu-item {
+                padding: 20px 25px;
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+
+            .menu-item .icon {
+                font-size: 3em;
+                width: auto;
+            }
+
+            .menu-item h3 {
+                font-size: 1.5em;
+            }
+
+            .menu-item p {
+                font-size: 1em;
+            }
+
+            .title h1 { font-size: 2em; }
+
+            .status-info {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .menu-item {
+                min-height: auto;
+                padding: 15px 20px;
+            }
+
+            .status-bar {
+                bottom: 10px;
+                padding: 10px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">
+            <h1>JEWELRY VISION</h1>
+            <p>Sistema di Sorveglianza Intelligente - Jetson Orin Nano</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Sezione Diamante -->
+            <div class="diamond-section">
+                <div class="diamond-center" onclick="showSystemInfo()">
+                    💎
+                </div>
+                <div class="diamond-info">
+                    <strong>Sistema Centrale</strong><br>
+                    Clicca per info sistema
+                </div>
+            </div>
+
+            <!-- Menu Opzioni -->
+            <div class="menu-section">
+                <!-- Sezione 1: Dataset Management -->
+                <div class="menu-item dataset" onclick="navigateToSection('dataset')">
+                    <span class="icon">📊</span>
+                    <div class="content">
+                        <h3>Dataset Management</h3>
+                        <p>Gestione dataset di training, raccolta immagini e annotazioni per sistemi di intelligenza artificiale</p>
+                    </div>
+                </div>
+
+                <!-- Sezione 2: Training & AI -->
+                <div class="menu-item training" onclick="navigateToSection('training')">
+                    <span class="icon">🧠</span>
+                    <div class="content">
+                        <h3>Training & AI</h3>
+                        <p>Addestramento modelli AI, configurazione parametri avanzati e ottimizzazione delle performance</p>
+                    </div>
+                </div>
+
+                <!-- Sezione 3: Video Surveillance -->
+                <div class="menu-item surveillance" onclick="navigateToSection('surveillance')">
+                    <span class="icon">📹</span>
+                    <div class="content">
+                        <h3>Video Surveillance</h3>
+                        <p>Streaming video live in tempo reale, visualizzazione camera e sistema di cattura frame</p>
+                    </div>
+                </div>
+
+                <!-- Sezione 4: Detection & Monitoring -->
+                <div class="menu-item monitoring" onclick="navigateToSection('monitoring')">
+                    <span class="icon">🎯</span>
+                    <div class="content">
+                        <h3>Detection & Monitoring</h3>
+                        <p>Sistema di rilevamento automatico avanzato, gestione allarmi e monitoraggio sicurezza 24/7</p>
+                    </div>
+                </div>
+
+                <!-- Sezione 5: Settings -->
+                <div class="menu-item settings" onclick="navigateToSection('settings')">
+                    <span class="icon">⚙️</span>
+                    <div class="content">
+                        <h3>Settings & Configuration</h3>
+                        <p>Configurazioni avanzate del sistema, parametri camera e impostazioni personalizzate</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="status-bar">
+        <div class="status-info">
+            <div class="status-item">
+                <div class="status-dot"></div>
+                <span>Sistema Online</span>
+            </div>
+            <div class="status-item">
+                <span>📷</span>
+                <span id="camera-status">Camera Ready</span>
+            </div>
+            <div class="status-item">
+                <span>🎯</span>
+                <span id="ai-status">AI Ready</span>
+            </div>
+            <div class="status-item">
+                <span>💻</span>
+                <span id="system-load">CPU: --% | RAM: --%</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function navigateToSection(section) {
+            console.log('Navigating to:', section);
+            
+            // Aggiungi effetto di transizione
+            document.body.style.opacity = '0.8';
+            
+            setTimeout(() => {
+                switch(section) {
+                    case 'dataset':
+                        window.location.href = '/dataset';
+                        break;
+                    case 'training':
+                        window.location.href = '/training';
+                        break;
+                    case 'surveillance':
+                        window.location.href = '/surveillance';
+                        break;
+                    case 'monitoring':
+                        window.location.href = '/monitoring';
+                        break;
+                    case 'settings':
+                        window.location.href = '/settings';
+                        break;
+                    default:
+                        console.log('Sezione non trovata');
+                }
+            }, 200);
+        }
+
+        function showSystemInfo() {
+            // Effetto speciale per il diamante
+            const diamond = document.querySelector('.diamond-center');
+            diamond.style.transform = 'scale(1.2) rotate(360deg)';
+            diamond.style.filter = 'drop-shadow(0 0 60px rgba(255, 215, 0, 1))';
+            
+            setTimeout(() => {
+                diamond.style.transform = 'scale(1)';
+                diamond.style.filter = 'drop-shadow(0 0 30px rgba(255, 215, 0, 0.8))';
+            }, 500);
+
+            // Mostra info sistema
+            alert('💎 JEWELRY VISION SYSTEM\n\n' +
+                  'Versione: 2.0 Final\n' +
+                  'Platform: Jetson Orin Nano 8GB\n' +
+                  'AI Engine: YOLO11 + OpenCV\n' +
+                  'Features: 5 Moduli Integrati\n\n' +
+                  'Sistema pronto per l\'uso!');
+        }
+
+        // Aggiorna status bar ogni 5 secondi
+        async function updateSystemStatus() {
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+                
+                document.getElementById('camera-status').textContent = 
+                    data.camera_user ? `${data.camera_user} Active` : 'Ready';
+                document.getElementById('ai-status').textContent = 
+                    data.yolo_available ? 'AI Ready' : 'AI Loading';
+                
+                // Simula carico sistema
+                const cpu = Math.floor(Math.random() * 30) + 20;
+                const ram = Math.floor(Math.random() * 40) + 30;
+                document.getElementById('system-load').textContent = `CPU: ${cpu}% | RAM: ${ram}%`;
+                
+            } catch (error) {
+                console.log('Status update error:', error);
+                document.getElementById('camera-status').textContent = 'Offline';
+            }
+        }
+
+        // Avvia aggiornamenti status
+        updateSystemStatus();
+        setInterval(updateSystemStatus, 5000);
+
+        // Effetti di caricamento pagina
+        document.addEventListener('DOMContentLoaded', function() {
+            document.body.style.opacity = '0';
+            setTimeout(() => {
+                document.body.style.transition = 'opacity 1s ease-in-out';
+                document.body.style.opacity = '1';
+            }, 100);
+        });
+    </script>
+</body>
+</html>

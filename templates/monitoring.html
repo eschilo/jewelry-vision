@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detection & Monitoring - Jewelry Vision</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --bg-dark: #1a1a2e;
+            --bg-darker: #16213e;
+            --text-light: #ecf0f1;
+            --border-color: rgba(52, 152, 219, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark), var(--bg-darker));
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header con breadcrumb */
+        .header {
+            background: rgba(44, 62, 80, 0.9);
+            padding: 1.5rem 2rem;
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--secondary-color);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+        }
+
+        .breadcrumb a:hover {
+            background: rgba(52, 152, 219, 0.2);
+            color: var(--text-light);
+        }
+
+        .breadcrumb .separator {
+            color: #7f8c8d;
+            font-size: 1.2rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-weight: 700;
+        }
+
+        .status-indicator {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-active {
+            background: var(--success-color);
+            box-shadow: 0 0 15px var(--success-color);
+            animation: pulse 2s infinite;
+        }
+
+        .status-inactive {
+            background: var(--accent-color);
+        }
+
+        /* Container principale */
+        .main-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Sezione video */
+        .video-section {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .video-container {
+            position: relative;
+            background: #000;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            min-height: 450px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--border-color);
+        }
+
+        /* FIX SPECIFICI PER JETSON L4T */
+#detectionFeed {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    border-radius: 13px;
+    /* Fix per codec Jetson */
+    image-rendering: auto;
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;
+}
+/* Forza refresh dell'immagine */
+.video-container {
+    image-rendering: -webkit-optimize-contrast;
+}
+
+
+        .video-placeholder {
+            color: #7f8c8d;
+            font-size: 1.3rem;
+            text-align: center;
+            padding: 3rem;
+            line-height: 1.6;
+        }
+
+        .video-placeholder .icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: 1px solid var(--success-color);
+        }
+
+        /* Controlli video */
+        .video-controls {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .control-btn:hover {
+            background: #2980b9;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+
+        .control-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .control-btn:disabled {
+            background: #7f8c8d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .control-btn.danger {
+            background: var(--accent-color);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .control-btn.danger:hover {
+            background: #c0392b;
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+        }
+
+        .control-btn.success {
+            background: var(--success-color);
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        .control-btn.success:hover {
+            background: #229954;
+            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+        }
+
+        /* Pannello di controllo */
+        .control-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .panel-section {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .panel-title {
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            color: var(--secondary-color);
+            border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 0.8rem;
+            font-weight: 700;
+        }
+
+        /* Stati del sistema */
+        .status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .status-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .status-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .status-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: var(--secondary-color);
+        }
+
+        .status-label {
+            font-size: 0.9rem;
+            color: #bdc3c7;
+            font-weight: 500;
+        }
+
+        /* Log delle detection */
+        .detection-log {
+            max-height: 350px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 12px;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .log-entry {
+            background: rgba(255, 255, 255, 0.05);
+            margin-bottom: 0.8rem;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--secondary-color);
+            transition: all 0.3s ease;
+        }
+
+        .log-entry:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .log-entry.alert {
+            border-left-color: var(--accent-color);
+            background: rgba(231, 76, 60, 0.1);
+        }
+
+        .log-entry.success {
+            border-left-color: var(--success-color);
+            background: rgba(39, 174, 96, 0.1);
+        }
+
+        .log-timestamp {
+            font-size: 0.85rem;
+            color: #95a5a6;
+            font-weight: 500;
+        }
+
+        .log-message {
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+
+        /* Impostazioni detection */
+        .settings-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .settings-label {
+            display: block;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+            color: var(--text-light);
+        }
+
+        .settings-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .settings-input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .confidence-display {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin-top: 0.5rem;
+        }
+
+        /* Responsive design */
+        @media (max-width: 1200px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+                padding: 1rem;
+            }
+            
+            .video-section {
+                order: 1;
+            }
+            
+            .control-panel {
+                order: 2;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+            }
+            
+            .page-title {
+                font-size: 1.5rem;
+            }
+            
+            .video-controls {
+                justify-content: center;
+            }
+            
+            .control-btn {
+                padding: 0.8rem 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            .status-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .breadcrumb {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+        }
+
+        /* Animazioni */
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .panel-section {
+            animation: slideIn 0.6s ease-out;
+        }
+
+        /* Scrollbar personalizzata */
+        .detection-log::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .detection-log::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        .detection-log::-webkit-scrollbar-thumb {
+            background: var(--secondary-color);
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .detection-log::-webkit-scrollbar-thumb:hover {
+            background: #2980b9;
+        }
+
+        /* Stati speciali */
+        .model-loading {
+            color: var(--warning-color);
+        }
+
+        .model-ready {
+            color: var(--success-color);
+        }
+
+        .model-error {
+            color: var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header con breadcrumb -->
+    <header class="header">
+        <nav class="breadcrumb">
+            <a href="/">🏠 Menu Principale</a>
+            <span class="separator">▶</span>
+            <span>Detection & Monitoring</span>
+        </nav>
+        <h1 class="page-title">
+            🎯 Detection & Monitoring
+            <span class="status-indicator" id="systemStatus"></span>
+        </h1>
+    </header>
+
+    <!-- Container principale -->
+    <div class="main-container">
+        <!-- Sezione video -->
+        <div class="video-section">
+            <div class="video-container" id="videoContainer">
+                <div class="video-placeholder" id="videoPlaceholder">
+                    <span class="icon">📹</span>
+                    Sistema di Detection AI Ready<br>
+                    <small>Clicca "Avvia Monitoring" per iniziare la sorveglianza intelligente</small>
+                </div>
+                <img id="detectionFeed" style="display: none;" alt="Detection Feed">
+                <div class="video-overlay" id="videoOverlay" style="display: none;">
+                    <span class="status-indicator status-active"></span>
+                    MONITORING ATTIVO
+                </div>
+            </div>
+
+            <!-- Controlli video -->
+            <div class="video-controls">
+                <button class="control-btn success" id="startBtn" onclick="startMonitoring()">
+                    ▶️ Avvia Monitoring
+                </button>
+                <button class="control-btn danger" id="stopBtn" onclick="stopMonitoring()" disabled>
+                    ⏹️ Ferma Monitoring
+                </button>
+                <button class="control-btn" onclick="captureFrame()">
+                    📸 Cattura Frame
+                </button>
+                <button class="control-btn" onclick="toggleFullscreen()">
+                    🔍 Schermo Intero
+                </button>
+            </div>
+        </div>
+
+        <!-- Pannello di controllo -->
+        <div class="control-panel">
+            <!-- Stato del sistema -->
+            <div class="panel-section">
+                <h3 class="panel-title">📊 Stato Sistema</h3>
+                <div class="status-grid">
+                    <div class="status-item">
+                        <div class="status-value" id="detectionCount">0</div>
+                        <div class="status-label">Detection Totali</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-value" id="alertCount">0</div>
+                        <div class="status-label">Allarmi</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-value" id="modelStatus">❌</div>
+                        <div class="status-label">Modello YOLO</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-value" id="uptime">00:00:00</div>
+                        <div class="status-label">Tempo Attivo</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Impostazioni detection -->
+            <div class="panel-section">
+                <h3 class="panel-title">⚙️ Impostazioni Detection</h3>
+                <div class="settings-group">
+                    <label class="settings-label" for="confidenceThreshold">
+                        Soglia Confidenza Detection
+                    </label>
+                    <input type="range" id="confidenceThreshold" class="settings-input" 
+                           min="0.1" max="1.0" step="0.1" value="0.5" 
+                           onchange="updateSettings()">
+                    <div class="confidence-display" id="confidenceValue">0.5 (50%)</div>
+                </div>
+                <div class="settings-group">
+                    <label class="settings-label" for="detectionClasses">
+                        Classi da Rilevare (Multi-select)
+                    </label>
+                    <select id="detectionClasses" class="settings-input" multiple>
+                        <option value="person" selected>👤 Persone</option>
+                        <option value="bag">👜 Borse</option>
+                        <option value="backpack">🎒 Zaini</option>
+                        <option value="handbag">👛 Borsette</option>
+                        <option value="cell phone">📱 Telefoni</option>
+                        <option value="laptop">💻 Laptop</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Log detection -->
+            <div class="panel-section">
+                <h3 class="panel-title">📝 Log Detection Tempo Reale</h3>
+                <div class="detection-log" id="detectionLog">
+                    <div class="log-entry success">
+                        <div class="log-timestamp" id="currentTime"></div>
+                        <div class="log-message">🚀 Sistema inizializzato e pronto per il monitoring</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variabili globali
+        let monitoringActive = false;
+        let detectionStats = {
+            total: 0,
+            alerts: 0,
+            startTime: null
+        };
+
+        // Inizializzazione pagina
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCurrentTime();
+            setInterval(updateCurrentTime, 1000);
+            setInterval(updateUptime, 1000);
+            checkSystemStatus();
+            setupConfidenceSlider();
+            setInterval(checkSystemStatus, 5000); // Controllo ogni 5 secondi
+        });
+
+        // Aggiorna orario corrente
+        function updateCurrentTime() {
+            const now = new Date();
+            const timeElement = document.getElementById('currentTime');
+            if (timeElement) {
+                timeElement.textContent = now.toLocaleString('it-IT');
+            }
+        }
+
+        // Aggiorna uptime
+        function updateUptime() {
+            if (detectionStats.startTime) {
+                const elapsed = Date.now() - detectionStats.startTime;
+                const hours = Math.floor(elapsed / 3600000);
+                const minutes = Math.floor((elapsed % 3600000) / 60000);
+                const seconds = Math.floor((elapsed % 60000) / 1000);
+                document.getElementById('uptime').textContent = 
+                    `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+        }
+
+        // Configura slider confidenza
+        function setupConfidenceSlider() {
+            const slider = document.getElementById('confidenceThreshold');
+            const valueDisplay = document.getElementById('confidenceValue');
+            
+            slider.addEventListener('input', function() {
+                const percentage = Math.round(this.value * 100);
+                valueDisplay.textContent = `${this.value} (${percentage}%)`;
+            });
+        }
+
+        // Avvia monitoring - ADATTATO AI TUOI ENDPOINT
+        async function startMonitoring() {
+            try {
+                addLogEntry('info', '🔄 Avvio monitoring in corso...');
+                
+                const response = await fetch('/api/start_monitoring', {  // TUO ENDPOINT
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {  // TUA STRUTTURA RESPONSE
+                    monitoringActive = true;
+                    detectionStats.startTime = Date.now();
+                    
+                    // Aggiorna UI
+                    document.getElementById('startBtn').disabled = true;
+                    document.getElementById('stopBtn').disabled = false;
+                    document.getElementById('systemStatus').className = 'status-indicator status-active';
+                    
+                    // Mostra video feed
+                    const videoFeed = document.getElementById('detectionFeed');
+                    const placeholder = document.getElementById('videoPlaceholder');
+                    const overlay = document.getElementById('videoOverlay');
+                    
+                    videoFeed.src = '/detection_feed?' + new Date().getTime();
+                    videoFeed.style.display = 'block';
+                    placeholder.style.display = 'none';
+                    overlay.style.display = 'block';
+                    
+                    addLogEntry('success', `✅ ${data.message}`);
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                console.error('Errore avvio monitoring:', error);
+                addLogEntry('error', `❌ Errore: ${error.message}`);
+            }
+        }
+
+        // Ferma monitoring - ADATTATO AI TUOI ENDPOINT
+        async function stopMonitoring() {
+            try {
+                addLogEntry('info', '🔄 Arresto monitoring in corso...');
+                
+                const response = await fetch('/api/stop_monitoring', {  // TUO ENDPOINT
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {  // TUA STRUTTURA RESPONSE
+                    monitoringActive = false;
+                    detectionStats.startTime = null;
+                    
+                    // Aggiorna UI
+                    document.getElementById('startBtn').disabled = false;
+                    document.getElementById('stopBtn').disabled = true;
+                    document.getElementById('systemStatus').className = 'status-indicator status-inactive';
+                    document.getElementById('uptime').textContent = '00:00:00';
+                    
+                    // Nascondi video feed
+                    const videoFeed = document.getElementById('detectionFeed');
+                    const placeholder = document.getElementById('videoPlaceholder');
+                    const overlay = document.getElementById('videoOverlay');
+                    
+                    videoFeed.style.display = 'none';
+                    placeholder.style.display = 'block';
+                    overlay.style.display = 'none';
+                    
+                    addLogEntry('success', `⏹️ ${data.message}`);
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                console.error('Errore stop monitoring:', error);
+                addLogEntry('error', `❌ Errore: ${error.message}`);
+            }
+        }
+
+        // Cattura frame - ADATTATO AI TUOI ENDPOINT
+        async function captureFrame() {
+            try {
+                const response = await fetch('/api/capture_frame', {  // TUO ENDPOINT
+                    method: 'POST'
+                });
+                const data = await response.json();
+                
+                if (data.success) {  // TUA STRUTTURA RESPONSE
+                    addLogEntry('success', `📸 ${data.message}`);
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                console.error('Errore cattura:', error);
+                addLogEntry('error', `❌ Errore cattura: ${error.message}`);
+            }
+        }
+
+        // Toggle fullscreen
+        function toggleFullscreen() {
+            const videoContainer = document.getElementById('videoContainer');
+            
+            if (!document.fullscreenElement) {
+                videoContainer.requestFullscreen().catch(err => {
+                    console.error('Errore fullscreen:', err);
+                    addLogEntry('error', 'Errore attivazione fullscreen');
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // Controlla stato sistema - ADATTATO AI TUOI ENDPOINT
+        async function checkSystemStatus() {
+            try {
+                const response = await fetch('/api/monitoring_status');  // NUOVO ENDPOINT
+                const data = await response.json();
+                
+                // Aggiorna stato modello
+                const modelStatusEl = document.getElementById('modelStatus');
+                if (data.model_loaded) {
+                    modelStatusEl.textContent = '✅';
+                    modelStatusEl.className = 'status-value model-ready';
+                } else {
+                    modelStatusEl.textContent = '❌';
+                    modelStatusEl.className = 'status-value model-error';
+                }
+                
+                // Aggiorna statistiche se disponibili
+                if (data.stats) {
+                    if (data.stats.detections_today !== undefined) {
+                        document.getElementById('detectionCount').textContent = data.stats.detections_today;
+                    }
+                    if (data.stats.alerts_today !== undefined) {
+                        document.getElementById('alertCount').textContent = data.stats.alerts_today;
+                    }
+                }
+                
+                // Sincronizza stato monitoring
+                if (data.monitoring_active !== monitoringActive) {
+                    monitoringActive = data.monitoring_active;
+                    updateUIState();
+                }
+                
+            } catch (error) {
+                console.error('Errore controllo stato:', error);
+                // Non mostrare errore nel log per evitare spam
+            }
+        }
+
+        // Aggiorna stato UI
+        function updateUIState() {
+            if (monitoringActive) {
+                document.getElementById('startBtn').disabled = true;
+                document.getElementById('stopBtn').disabled = false;
+                document.getElementById('systemStatus').className = 'status-indicator status-active';
+            } else {
+                document.getElementById('startBtn').disabled = false;
+                document.getElementById('stopBtn').disabled = true;
+                document.getElementById('systemStatus').className = 'status-indicator status-inactive';
+            }
+        }
+
+        // Aggiorna impostazioni
+        function updateSettings() {
+            const confidence = document.getElementById('confidenceThreshold').value;
+            const classes = Array.from(document.getElementById('detectionClasses').selectedOptions)
+                               .map(option => option.value);
+            
+            // Log aggiornamento
+            addLogEntry('info', `⚙️ Impostazioni aggiornate: confidenza ${confidence}, classi: ${classes.join(', ')}`);
+        }
+
+        // Aggiungi entry al log
+        function addLogEntry(type, message) {
+            const logContainer = document.getElementById('detectionLog');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            
+            const timestamp = new Date().toLocaleTimeString('it-IT');
+            entry.innerHTML = `
+                <div class="log-timestamp">${timestamp}</div>
+                <div class="log-message">${message}</div>
+            `;
+            
+            logContainer.insertBefore(entry, logContainer.firstChild);
+            
+            // Mantieni solo gli ultimi 100 log
+            while (logContainer.children.length > 100) {
+                logContainer.removeChild(logContainer.lastChild);
+            }
+            
+            // Aggiorna statistiche se necessario
+            if (type === 'detection') {
+                detectionStats.total++;
+                document.getElementById('detectionCount').textContent = detectionStats.total;
+            } else if (type === 'alert') {
+                detectionStats.alerts++;
+                document.getElementById('alertCount').textContent = detectionStats.alerts;
+            }
+        }
+
+        // Gestione errori video feed
+        document.getElementById('detectionFeed').addEventListener('error', function() {
+            if (monitoringActive) {
+                addLogEntry('error', '📡 Errore feed video, tentativo riconnessione...');
+                setTimeout(() => {
+                    if (monitoringActive) {
+                        this.src = '/detection_feed?' + new Date().getTime();
+                    }
+                }, 3000);
+            }
+        });
+
+        // Gestione caricamento video feed
+        document.getElementById('detectionFeed').addEventListener('load', function() {
+            if (monitoringActive) {
+                addLogEntry('success', '📡 Feed video connesso');
+            }
+        });
+
+        // Cleanup quando si lascia la pagina
+        window.addEventListener('beforeunload', function() {
+            if (monitoringActive) {
+                fetch('/api/stop_monitoring', { method: 'POST' });
+            }
+        });
+
+        // Shortcut tastiera
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey) {
+                switch(e.key) {
+                    case 's':
+                        e.preventDefault();
+                        if (!monitoringActive) startMonitoring();
+                        break;
+                    case 'q':
+                        e.preventDefault();
+                        if (monitoringActive) stopMonitoring();
+                        break;
+                    case 'c':
+                        e.preventDefault();
+                        captureFrame();
+                        break;
+                    case 'f':
+                        e.preventDefault();
+                        toggleFullscreen();
+                        break;
+                }
+            }
+        });
+
+        // Gestione resize finestra
+        window.addEventListener('resize', function() {
+            // Aggiorna layout responsive se necessario
+            const videoFeed = document.getElementById('detectionFeed');
+            if (videoFeed.style.display !== 'none') {
+                // Ricarica il feed per adattarsi alle nuove dimensioni
+                setTimeout(() => {
+                    if (monitoringActive) {
+                        videoFeed.src = '/detection_feed?' + new Date().getTime();
+                    }
+                }, 100);
+            }
+        });
+
+        // Gestione visibilità pagina (pausa/riprendi quando si cambia tab)
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                // Pagina nascosta - riduci frequenza aggiornamenti
+                clearInterval(window.statusInterval);
+                window.statusInterval = setInterval(checkSystemStatus, 10000); // Ogni 10 sec
+            } else {
+                // Pagina visibile - riprendi frequenza normale
+                clearInterval(window.statusInterval);
+                window.statusInterval = setInterval(checkSystemStatus, 5000); // Ogni 5 sec
+                checkSystemStatus(); // Controllo immediato
+            }
+        });
+
+        // Notifiche browser (se supportate)
+        function showNotification(title, message, type = 'info') {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                const icon = type === 'error' ? '❌' : type === 'success' ? '✅' : 'ℹ️';
+                new Notification(`${icon} ${title}`, {
+                    body: message,
+                    icon: '/static/favicon.ico',
+                    tag: 'jewelry-vision'
+                });
+            }
+        }
+
+        // Richiedi permessi notifiche
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+
+        // Funzione per esportare log (feature bonus)
+        function exportLogs() {
+            const logs = Array.from(document.querySelectorAll('.log-entry')).map(entry => {
+                const timestamp = entry.querySelector('.log-timestamp').textContent;
+                const message = entry.querySelector('.log-message').textContent;
+                return `${timestamp}: ${message}`;
+            });
+            
+            const logText = logs.join('\n');
+            const blob = new Blob([logText], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `jewelry_vision_logs_${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            addLogEntry('info', '📄 Log esportati con successo');
+        }
+
+        // Aggiunge pulsante export logs al pannello (opzionale)
+        document.addEventListener('DOMContentLoaded', function() {
+            const logPanel = document.querySelector('.detection-log').parentElement;
+            const exportBtn = document.createElement('button');
+            exportBtn.className = 'control-btn';
+            exportBtn.innerHTML = '📄 Esporta Log';
+            exportBtn.onclick = exportLogs;
+            exportBtn.style.marginTop = '1rem';
+            exportBtn.style.width = '100%';
+            logPanel.appendChild(exportBtn);
+        });
+
+        // Debug mode (per sviluppo)
+        window.jewelryVisionDebug = {
+            addTestLog: () => addLogEntry('info', 'Test log entry'),
+            clearLogs: () => document.getElementById('detectionLog').innerHTML = '',
+            getStats: () => detectionStats,
+            forceStatusCheck: checkSystemStatus
+        };
+
+        console.log('🎯 Jewelry Vision Monitoring System caricato');
+        console.log('Shortcuts disponibili:');
+        console.log('- Ctrl+S: Avvia monitoring');
+        console.log('- Ctrl+Q: Ferma monitoring'); 
+        console.log('- Ctrl+C: Cattura frame');
+        console.log('- Ctrl+F: Fullscreen');
+    </script>
+</body>
+</html>

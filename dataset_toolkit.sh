@@ -337,6 +337,7 @@ main() {
                 print_error "Opzione non valida. Riprova."
                 ;;
         esac
+        continue  # Torna al menu dopo ogni opzione
         
         echo ""
         read -p "Premi Enter per continuare..."

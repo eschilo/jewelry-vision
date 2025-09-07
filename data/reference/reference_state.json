@@ -1,0 +1,58 @@
+{
+  "timestamp": "2025-09-03T23:29:49.081643",
+  "total_objects": 3,
+  "objects": [
+    {
+      "bbox": [
+        671,
+        177,
+        970,
+        509
+      ],
+      "confidence": 0.8128607869148254,
+      "class_name": "cup",
+      "class_id": 41,
+      "center": [
+        820,
+        343
+      ],
+      "area": 99268
+    },
+    {
+      "bbox": [
+        238,
+        95,
+        571,
+        471
+      ],
+      "confidence": 0.766677737236023,
+      "class_name": "cup",
+      "class_id": 41,
+      "center": [
+        404,
+        283
+      ],
+      "area": 125208
+    },
+    {
+      "bbox": [
+        581,
+        500,
+        1115,
+        670
+      ],
+      "confidence": 0.7641504406929016,
+      "class_name": "knife",
+      "class_id": 43,
+      "center": [
+        848,
+        585
+      ],
+      "area": 90780
+    }
+  ],
+  "categories": {
+    "cup": 2,
+    "knife": 1
+  }
+}

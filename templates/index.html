@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jewelry Vision System - Videosorveglianza</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            background: rgba(244, 67, 54, 0.1);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 2px solid rgba(244, 67, 54, 0.3);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            color: #f44336;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(244, 67, 54, 0.5);
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .status-card {
+            background: rgba(15, 52, 96, 0.8);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .status-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .status-card h3 {
+            color: #f44336;
+            margin-bottom: 10px;
+        }
+
+        .video-section {
+            background: rgba(26, 26, 46, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 2px solid rgba(244, 67, 54, 0.3);
+        }
+
+        .video-container {
+            text-align: center;
+            background: rgba(0,0,0,0.9);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        #video-stream {
+            max-width: 100%;
+            height: 600px;
+            background: #000;
+            border-radius: 8px;
+            object-fit: contain;
+            border: 1px solid #333;
+        }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1em;
+        }
+
+        .btn:hover {
+            background: #d32f2f;
+            transform: translateY(-2px);
+        }
+
+        .btn.success {
+            background: #4CAF50;
+        }
+
+        .btn.success:hover {
+            background: #45a049;
+        }
+
+        .btn.info {
+            background: #2196F3;
+        }
+
+        .btn.info:hover {
+            background: #1976D2;
+        }
+
+        .log-section {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 15px;
+            border-radius: 8px;
+            height: 200px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            border: 1px solid rgba(244, 67, 54, 0.3);
+        }
+
+        .log-entry {
+            margin: 5px 0;
+            padding: 3px;
+            border-left: 2px solid #f44336;
+            padding-left: 8px;
+        }
+
+        @media (max-width: 768px) {
+            #video-stream {
+                height: 400px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💎 JEWELRY VISION SYSTEM</h1>
+            <p>Sistema di Videosorveglianza Intelligente - Jetson Orin Nano</p>
+        </div>
+
+        <div class="status-grid">
+            <div class="status-card">
+                <h3>📹 Camera</h3>
+                <p id="camera-status">Connessa</p>
+            </div>
+            <div class="status-card">
+                <h3>🎯 Detection</h3>
+                <p id="detection-status">Ready</p>
+            </div>
+            <div class="status-card">
+                <h3>🚨 Allarmi</h3>
+                <p id="alerts-status">Standby</p>
+            </div>
+            <div class="status-card">
+                <h3>💻 Sistema</h3>
+                <p id="system-status">Online</p>
+            </div>
+        </div>
+
+        <div class="video-section">
+            <h3 style="color: #f44336; margin-bottom: 15px;">📺 LIVE VIDEO STREAM</h3>
+            <div class="video-container">
+                <img id="video-stream" src="/video_feed" alt="Live Stream" style="display: none;">
+                <div id="stream-placeholder" style="display: flex; align-items: center; justify-content: center; height: 600px; color: #888; font-size: 2em; background: linear-gradient(45deg, #1a1a1a 25%, #2a2a2a 25%); background-size: 40px 40px; border: 2px dashed #555; border-radius: 8px;">
+                    📹<br>Stream non attivo<br><small style="font-size: 0.5em;">Clicca "Avvia Stream" per iniziare</small>
+                </div>
+                
+                <div class="controls">
+                    <button class="btn success" onclick="startStream()">📹 Avvia Stream</button>
+                    <button class="btn" onclick="stopStream()">⏹️ Ferma Stream</button>
+                    <button class="btn info" onclick="captureFrame()">📸 Cattura</button>
+                    <button class="btn info" onclick="toggleDetection()">🎯 Toggle Detection</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="video-section">
+            <h3 style="color: #f44336; margin-bottom: 15px;">📝 SYSTEM LOG</h3>
+            <div class="log-section" id="system-logs">
+                <div class="log-entry">[System] Jewelry Vision System inizializzato</div>
+                <div class="log-entry">[Info] Sistema pronto per l'uso</div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    let streamActive = false;
+    let detectionActive = false;
+
+    async function startStream() {
+        try {
+            const response = await fetch('/api/start_streaming', { method: 'POST' });
+            const data = await response.json();
+            
+            if (data.success) {
+                document.getElementById('video-stream').style.display = 'block';
+                document.getElementById('stream-placeholder').style.display = 'none';
+                document.getElementById('video-stream').src = '/video_feed?' + new Date().getTime();
+                streamActive = true;
+                addLogEntry('Stream avviato con successo');
+                updateStatus('camera-status', 'Streaming Attivo');
+            } else {
+                addLogEntry('Errore avvio stream: ' + data.message);
+            }
+        } catch (error) {
+            addLogEntry('Errore connessione: ' + error.message);
+        }
+    }
+
+    async function stopStream() {
+        try {
+            const response = await fetch('/api/stop_streaming', { method: 'POST' });
+            const data = await response.json();
+            
+            document.getElementById('video-stream').style.display = 'none';
+            document.getElementById('stream-placeholder').style.display = 'flex';
+            streamActive = false;
+            addLogEntry('Stream fermato');
+            updateStatus('camera-status', 'Connessa');
+        } catch (error) {
+            addLogEntry('Errore stop stream: ' + error.message);
+        }
+    }
+
+    async function captureFrame() {
+        try {
+            const response = await fetch('/api/capture_frame', { method: 'POST' });
+            const data = await response.json();
+            addLogEntry('Frame catturato: ' + data.message);
+        } catch (error) {
+            addLogEntry('Errore cattura: ' + error.message);
+        }
+    }
+
+    async function toggleDetection() {
+        try {
+            const response = await fetch('/api/start_monitoring', { method: 'POST' });
+            const data = await response.json();
+            detectionActive = !detectionActive;
+            updateStatus('detection-status', detectionActive ? 'Attivo' : 'Ready');
+            addLogEntry('Detection ' + (detectionActive ? 'attivato' : 'disattivato'));
+        } catch (error) {
+            addLogEntry('Errore toggle detection: ' + error.message);
+        }
+    }
+
+    function updateStatus(elementId, status) {
+        document.getElementById(elementId).textContent = status;
+    }
+
+    function addLogEntry(message) {
+        const now = new Date();
+        const timestamp = now.toTimeString().slice(0, 8);
+        const logPanel = document.getElementById('system-logs');
+        const entry = document.createElement('div');
+        entry.className = 'log-entry';
+        entry.textContent = `[${timestamp}] ${message}`;
+        logPanel.appendChild(entry);
+        logPanel.scrollTop = logPanel.scrollHeight;
+        
+        // Mantieni solo ultimi 20 log
+        while (logPanel.children.length > 20) {
+            logPanel.removeChild(logPanel.firstChild);
+        }
+    }
+
+    // Aggiorna status ogni 5 secondi
+    setInterval(async () => {
+        try {
+            const response = await fetch('/api/status');
+            const data = await response.json();
+            updateStatus('system-status', 'Online');
+        } catch (error) {
+            updateStatus('system-status', 'Errore connessione');
+        }
+    }, 5000);
+</script>
+</body>
+</html>

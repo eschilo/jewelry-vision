@@ -1,6 +1,34 @@
-ultralytics>=8.0.0
-opencv-python>=4.8.0
+# Jewelry Vision - Requirements
+# Sistema di videosorveglianza intelligente per NVIDIA Jetson Orin Nano
+
+# Web Framework
+Flask==2.3.3
+Werkzeug==2.3.7
+
+# Computer Vision & AI
+opencv-python==4.8.1.78
+ultralytics==8.0.200
 torch>=2.0.0
-numpy>=1.21.0
-Pillow>=9.0.0
-tqdm>=4.64.0
+torchvision>=0.15.0
+torchaudio>=2.0.0
+
+# Image Processing
+Pillow==10.0.1
+numpy==1.24.3
+
+# Utilities
+requests==2.31.0
+python-dateutil==2.8.2
+pytz==2023.3
+
+# Development & Logging
+pathlib2==2.3.7
+
+# Jetson Specific (install separately)
+# jetson-stats  # sudo pip install jetson-stats
+# jetson-gpio   # sudo pip install Jetson.GPIO
+
+# Note per installazione su Jetson Orin Nano:
+# 1. PyTorch: pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+# 2. OpenCV: Spesso pre-installato su JetPack, altrimenti: pip install opencv-python
+# 3. CUDA Support: Verificare con: python -c "import torch; print(torch.cuda.is_available())"

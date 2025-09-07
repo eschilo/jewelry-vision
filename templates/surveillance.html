@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Surveillance - Jewelry Vision</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            background: rgba(255, 152, 0, 0.1);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 2px solid rgba(255, 152, 0, 0.3);
+            position: relative;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: #ffd700;
+            color: #1a1a2e;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            color: #FF9800;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255, 152, 0, 0.5);
+        }
+
+        .video-section {
+            background: rgba(26, 26, 46, 0.8);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 2px solid rgba(255, 152, 0, 0.3);
+        }
+
+        .video-container {
+            text-align: center;
+            background: rgba(0,0,0,0.9);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        #video-stream {
+            max-width: 100%;
+            height: 600px;
+            background: #000;
+            border-radius: 8px;
+            object-fit: contain;
+            border: 1px solid #333;
+            display: none;
+        }
+
+        #stream-placeholder {
+            width: 100%;
+            height: 600px;
+            background: linear-gradient(45deg, #1a1a1a 25%, #2a2a2a 25%, #2a2a2a 50%, #1a1a1a 50%, #1a1a1a 75%, #2a2a2a 75%);
+            background-size: 40px 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            font-size: 2em;
+            border: 2px dashed #555;
+            flex-direction: column;
+        }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: #FF9800;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1em;
+            min-width: 150px;
+        }
+
+        .btn:hover {
+            background: #F57C00;
+            transform: translateY(-2px);
+        }
+
+        .btn.success {
+            background: #4CAF50;
+        }
+
+        .btn.success:hover {
+            background: #45a049;
+        }
+
+        .btn.danger {
+            background: #f44336;
+        }
+
+        .btn.danger:hover {
+            background: #d32f2f;
+        }
+
+        .btn.info {
+            background: #2196F3;
+        }
+
+        .btn.info:hover {
+            background: #1976D2;
+        }
+
+        .status-bar {
+            background: rgba(15, 52, 96, 0.8);
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            text-align: center;
+        }
+
+        .status-item h4 {
+            color: #FF9800;
+            margin-bottom: 8px;
+            font-size: 1em;
+        }
+
+        .status-value {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .log-section {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 15px;
+            border-radius: 8px;
+            height: 150px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            border: 1px solid rgba(255, 152, 0, 0.3);
+        }
+
+        .log-entry {
+            margin: 3px 0;
+            padding: 2px 5px;
+            border-left: 2px solid #FF9800;
+            padding-left: 8px;
+        }
+
+        .log-entry.success {
+            border-left-color: #4CAF50;
+            color: #90EE90;
+        }
+
+        .log-entry.error {
+            border-left-color: #f44336;
+            color: #FFCDD2;
+        }
+
+        @media (max-width: 768px) {
+            #video-stream, #stream-placeholder {
+                height: 400px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 90%;
+                max-width: 300px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #video-stream, #stream-placeholder {
+                height: 300px;
+            }
+
+            .container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="/" class="back-btn">← Menu Principale</a>
+            <h1>📹 VIDEO SURVEILLANCE</h1>
+            <p>Streaming Video Live - Visualizzazione Camera</p>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-grid">
+                <div class="status-item">
+                    <h4>📷 Camera Status</h4>
+                    <div class="status-value" id="camera-status">Pronta</div>
+                </div>
+                <div class="status-item">
+                    <h4>📡 Streaming</h4>
+                    <div class="status-value" id="streaming-status">Offline</div>
+                </div>
+                <div class="status-item">
+                    <h4>🎥 Risoluzione</h4>
+                    <div class="status-value">1280x720</div>
+                </div>
+                <div class="status-item">
+                    <h4>⚡ FPS</h4>
+                    <div class="status-value" id="fps-display">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Video Section -->
+        <div class="video-section">
+            <h2 style="color: #FF9800; margin-bottom: 20px; text-align: center;">📺 LIVE VIDEO STREAM</h2>
+            
+            <div class="video-container">
+                <img id="video-stream" src="" alt="Live Stream">
+                <div id="stream-placeholder">
+                    📹<br>
+                    Stream Non Attivo<br>
+                    <small style="font-size: 0.5em;">Clicca "Avvia Stream" per iniziare la visualizzazione</small>
+                </div>
+                
+                <div class="controls">
+                    <button class="btn success" onclick="startStream()">📹 Avvia Stream</button>
+                    <button class="btn danger" onclick="stopStream()">⏹️ Ferma Stream</button>
+                    <button class="btn info" onclick="captureFrame()">📸 Cattura Frame</button>
+                    <button class="btn info" onclick="toggleFullscreen()">🔍 Fullscreen</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Log Section -->
+        <div class="video-section">
+            <h3 style="color: #FF9800; margin-bottom: 15px;">📝 LOG STREAMING</h3>
+            <div class="log-section" id="stream-logs">
+                <div class="log-entry">[SYSTEM] Modulo Video Surveillance caricato</div>
+                <div class="log-entry">[INFO] Sistema pronto per streaming video</div>
+                <div class="log-entry">[INFO] Modalità dedicata - nessun conflitto con detection</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let streamActive = false;
+
+        async function startStream() {
+            try {
+                const response = await fetch('/api/start_streaming', { method: 'POST' });
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('video-stream').src = '/video_feed?' + new Date().getTime();
+                    document.getElementById('video-stream').style.display = 'block';
+                    document.getElementById('stream-placeholder').style.display = 'none';
+                    streamActive = true;
+                    
+                    updateStatus('camera-status', 'Attiva');
+                    updateStatus('streaming-status', 'Online');
+                    addLogEntry('Stream avviato con successo', 'success');
+                } else {
+                    addLogEntry('Errore avvio stream: ' + data.message, 'error');
+                }
+            } catch (error) {
+                addLogEntry('Errore connessione: ' + error.message, 'error');
+            }
+        }
+
+        async function stopStream() {
+            try {
+                const response = await fetch('/api/stop_streaming', { method: 'POST' });
+                const data = await response.json();
+                
+                document.getElementById('video-stream').style.display = 'none';
+                document.getElementById('stream-placeholder').style.display = 'flex';
+                document.getElementById('video-stream').src = '';
+                streamActive = false;
+                
+                updateStatus('camera-status', 'Pronta');
+                updateStatus('streaming-status', 'Offline');
+                updateStatus('fps-display', '0');
+                addLogEntry('Stream fermato', 'success');
+            } catch (error) {
+                addLogEntry('Errore stop stream: ' + error.message, 'error');
+            }
+        }
+
+        async function captureFrame() {
+            try {
+                const response = await fetch('/api/capture_frame', { method: 'POST' });
+                const data = await response.json();
+                addLogEntry('Frame catturato: ' + data.message, 'success');
+            } catch (error) {
+                addLogEntry('Errore cattura: ' + error.message, 'error');
+            }
+        }
+
+        function toggleFullscreen() {
+            const video = document.getElementById('video-stream');
+            if (video.requestFullscreen) {
+                video.requestFullscreen();
+            } else if (video.webkitRequestFullscreen) {
+                video.webkitRequestFullscreen();
+            }
+        }
+
+        function updateStatus(elementId, value) {
+            document.getElementById(elementId).textContent = value;
+        }
+
+        function addLogEntry(message, type = '') {
+            const now = new Date();
+            const timestamp = now.toTimeString().slice(0, 8);
+            const logPanel = document.getElementById('stream-logs');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${timestamp}] ${message}`;
+            logPanel.appendChild(entry);
+            logPanel.scrollTop = logPanel.scrollHeight;
+            
+            // Mantieni solo ultimi 20 log
+            while (logPanel.children.length > 20) {
+                logPanel.removeChild(logPanel.firstChild);
+            }
+        }
+
+        // Aggiorna FPS simulato (sostituisci con dati reali se disponibili)
+        function updateFPS() {
+            if (streamActive) {
+                const fps = Math.floor(Math.random() * 5) + 25; // Simula 25-30 FPS
+                updateStatus('fps-display', fps);
+            }
+        }
+
+        // Aggiorna status ogni 5 secondi
+        async function updateSystemStatus() {
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+                
+                // Aggiorna status reali dal server se disponibili
+                if (data.streaming_active !== streamActive) {
+                    streamActive = data.streaming_active;
+                    updateStatus('streaming-status', streamActive ? 'Online' : 'Offline');
+                }
+                
+                updateFPS();
+                
+            } catch (error) {
+                console.log('Status update error:', error);
+            }
+        }
+
+        // Inizializzazione
+        document.addEventListener('DOMContentLoaded', function() {
+            addLogEntry('Interfaccia Video Surveillance caricata', 'success');
+            updateSystemStatus();
+            setInterval(updateSystemStatus, 5000);
+            setInterval(updateFPS, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📈 Dashboard & Report - Jewelry Vision</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #ffffff; min-height: 100vh;
+        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .header {
+            text-align: center; padding: 30px 0; background: rgba(156, 39, 176, 0.1);
+            border-radius: 15px; margin-bottom: 30px; border: 2px solid rgba(156, 39, 176, 0.3);
+        }
+        .header h1 {
+            font-size: 2.5em; color: #9C27B0; margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(156, 39, 176, 0.5);
+        }
+        .back-btn {
+            position: absolute; top: 20px; left: 20px; background: #ffd700;
+            color: #1a1a2e; padding: 10px 20px; border-radius: 8px;
+            text-decoration: none; font-weight: bold; transition: all 0.3s ease;
+        }
+        .back-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3); }
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px; margin-bottom: 30px;
+        }
+        .stat-card {
+            background: rgba(15, 52, 96, 0.8); padding: 25px; border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1); text-align: center;
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            border-color: #9C27B0;
+        }
+        .stat-icon { font-size: 3em; margin-bottom: 15px; color: #9C27B0; }
+        .stat-value { font-size: 2.5em; font-weight: bold; color: #4CAF50; margin-bottom: 5px; }
+        .stat-label { font-size: 1.1em; color: #cccccc; }
+        .chart-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 20px; margin-bottom: 30px;
+        }
+        .chart-card {
+            background: rgba(15, 52, 96, 0.8); padding: 25px; border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .chart-card h3 { color: #9C27B0; margin-bottom: 20px; font-size: 1.3em; }
+        .chart-placeholder {
+            height: 300px; background: rgba(26, 26, 46, 0.8); border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px dashed rgba(156, 39, 176, 0.3); position: relative;
+        }
+        .chart-placeholder::before {
+            content: '📊'; font-size: 4em; color: rgba(156, 39, 176, 0.5);
+        }
+        .activity-panel {
+            background: rgba(15, 52, 96, 0.8); padding: 25px; border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 30px;
+        }
+        .activity-list { max-height: 400px; overflow-y: auto; }
+        .activity-item {
+            padding: 15px; margin: 10px 0; background: rgba(26, 26, 46, 0.8);
+            border-radius: 8px; border-left: 4px solid #9C27B0;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .activity-icon { font-size: 1.5em; margin-right: 15px; }
+        .activity-text { flex: 1; }
+        .activity-time { color: #888; font-size: 0.9em; }
+        .controls-panel {
+            background: rgba(15, 52, 96, 0.8); padding: 25px; border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1); text-align: center;
+        }
+        .control-btn {
+            background: #9C27B0; color: white; border: none; padding: 12px 24px;
+            border-radius: 8px; font-weight: bold; cursor: pointer; margin: 10px;
+            transition: all 0.3s ease;
+        }
+        .control-btn:hover { background: #7B1FA2; transform: translateY(-2px); }
+        .live-indicator {
+            display: inline-block; width: 12px; height: 12px; background: #4CAF50;
+            border-radius: 50%; margin-right: 8px; animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+        }
+        .progress-ring {
+            width: 120px; height: 120px; margin: 0 auto 15px;
+        }
+        .progress-ring circle {
+            fill: none; stroke: #444; stroke-width: 8;
+            transform: rotate(-90deg); transform-origin: 50% 50%;
+        }
+        .progress-ring .progress {
+            stroke: #9C27B0; stroke-dasharray: 314; stroke-dashoffset: 157;
+            transition: stroke-dashoffset 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-btn">← Menu Principale</a>
+    
+    <div class="container">
+        <div class="header">
+            <h1>📈 DASHBOARD & REPORT</h1>
+            <p><span class="live-indicator"></span>Monitoraggio Live delle Prestazioni Sistema</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">🎯</div>
+                <div class="stat-value" id="total-detections">1,247</div>
+                <div class="stat-label">Detection Totali</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">✅</div>
+                <div class="stat-value" id="accuracy-rate">94.3%</div>
+                <div class="stat-label">Accuratezza</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🚨</div>
+                <div class="stat-value" id="alerts-today">12</div>
+                <div class="stat-label">Allarmi Oggi</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⏱️</div>
+                <div class="stat-value" id="uptime-hours">127h</div>
+                <div class="stat-label">Uptime Sistema</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📷</div>
+                <div class="stat-value" id="fps-current">29.8</div>
+                <div class="stat-label">FPS Correnti</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🧠</div>
+                <div class="stat-value" id="cpu-usage">42%</div>
+                <div class="stat-label">Utilizzo CPU</div>
+            </div>
+        </div>
+
+        <div class="chart-grid">
+            <div class="chart-card">
+                <h3>📊 Detection nel Tempo</h3>
+                <div class="chart-placeholder" id="detection-chart">
+                    <div style="text-align: center; color: #888;">
+                        <div style="font-size: 1.2em; margin-bottom: 10px;">Grafico Detection</div>
+                        <div>Ultimi 7 giorni</div>
+                    </div>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h3>🎯 Accuratezza Prestazioni</h3>
+                <div class="chart-placeholder" id="accuracy-chart">
+                    <div style="text-align: center; color: #888;">
+                        <div class="progress-ring">
+                            <svg width="120" height="120">
+                                <circle cx="60" cy="60" r="50" stroke="#444" stroke-width="8" fill="none"/>
+                                <circle cx="60" cy="60" r="50" stroke="#9C27B0" stroke-width="8" fill="none" 
+                                        stroke-dasharray="314" stroke-dashoffset="31" class="progress"/>
+                            </svg>
+                        </div>
+                        <div>94.3% Accuratezza</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-grid">
+            <div class="chart-card">
+                <h3>🌡️ Monitoraggio Sistema</h3>
+                <div class="chart-placeholder" id="system-chart">
+                    <div style="text-align: center; color: #888;">
+                        <div style="font-size: 1.2em; margin-bottom: 10px;">Temperatura & Prestazioni</div>
+                        <div>Monitoraggio Real-time</div>
+                    </div>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h3>🔔 Storico Allarmi</h3>
+                <div class="chart-placeholder" id="alerts-chart">
+                    <div style="text-align: center; color: #888;">
+                        <div style="font-size: 1.2em; margin-bottom: 10px;">Distribuzione Allarmi</div>
+                        <div>Per tipo e gravità</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="activity-panel">
+            <h3 style="color: #9C27B0; margin-bottom: 20px;">📋 ATTIVITÀ RECENTI</h3>
+            <div class="activity-list" id="activity-list">
+                <div class="activity-item">
+                    <span class="activity-icon">🎯</span>
+                    <div class="activity-text">
+                        <strong>Detection gioielli</strong><br>
+                        Rilevati 3 oggetti con confidenza 89.2%
+                    </div>
+                    <span class="activity-time">2 min fa</span>
+                </div>
+                <div class="activity-item">
+                    <span class="activity-icon">👤</span>
+                    <div class="activity-

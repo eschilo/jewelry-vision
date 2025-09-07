@@ -1,13 +1,113 @@
+# Jewelry Vision - Git Ignore File
+
+# Python
 __pycache__/
 *.py[cod]
-.env
-dataset/raw_images/
-*.jpg
-*.jpeg
-*.png
-*.pt
-*.pth
-logs/*.log
-backups/
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+jewelry_vision_env/
+venv/
+ENV/
+env/
+.venv/
+
+# IDE
 .vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+logs/*.log
+*.log
+
+# Captures e Recordings (file grandi)
+captures/*.jpg
+captures/*.png
+recordings/*.mp4
+recordings/*.avi
+
+# Modelli YOLO (possono essere grandi)
+models/*.pt
+models/*.onnx
+models/*.engine
+
+# Configurazioni sensibili
+config/secrets.json
+config/api_keys.json
+.env
+
+# Backup files
+*.backup
+*.bak
+*_backup*
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Jetson specific
+.tegrastats
+*.nvvp
+
+# Flask
+instance/
+.webassets-cache
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Documentation builds
+docs/_build/
+
+# Database files
+*.db
+*.sqlite3
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# Node.js (se usi build tools)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Exclude specific large files but keep directory structure
+!captures/.gitkeep
+!recordings/.gitkeep
+!models/.gitkeep
+!logs/.gitkeep

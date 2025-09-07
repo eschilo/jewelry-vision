@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>💎 Jewelry Vision Test</title>
+    <style>
+        body { 
+            background: #1a1a2e; 
+            color: white; 
+            font-family: Arial; 
+            text-align: center; 
+            padding: 50px; 
+        }
+        .diamond { 
+            font-size: 100px; 
+            color: gold; 
+            cursor: pointer; 
+        }
+        .diamond:hover { transform: scale(1.1); }
+    </style>
+</head>
+<body>
+    <h1>💎 JEWELRY VISION SYSTEM</h1>
+    <p>Test Interfaccia Web</p>
+    
+    <div class="diamond" onclick="alert('Menu funziona!')">💎</div>
+    <p>Clicca il diamante per test</p>
+    
+    <div id="status">Caricamento status...</div>
+    
+    <script>
+        async function updateStatus() {
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+                document.getElementById('status').innerHTML = 
+                    `CPU: ${data.cpu_usage}% | RAM: ${data.memory_usage}%`;
+            } catch(e) {
+                document.getElementById('status').innerHTML = 'Errore status';
+            }
+        }
+        
+        // Aggiorna ogni 3 secondi
+        setInterval(updateStatus, 3000);
+        updateStatus();
+    </script>
+</body>
+</html>
