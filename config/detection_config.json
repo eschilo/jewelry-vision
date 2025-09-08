@@ -1,0 +1,49 @@
+{
+  "active_scenario": "jewelry_security",
+  "targets": {
+    "people": {
+      "enabled": true,
+      "model_path": null,
+      "confidence_threshold": 0.5,
+      "alert_threshold": 0.7,
+      "database_source": "ultralytics",
+      "alert_rules": {
+        "immediate_alert": true,
+        "track_movement": true
+      }
+    },
+    "jewelry": {
+      "enabled": false,
+      "model_path": "models/custom/jewelry_yolo11.pt",
+      "confidence_threshold": 0.6,
+      "alert_threshold": 0.8,
+      "database_source": "local",
+      "classes": {
+        "0": {
+          "name": "ring",
+          "value_multiplier": 1.2
+        },
+        "1": {
+          "name": "necklace",
+          "value_multiplier": 1.5
+        },
+        "2": {
+          "name": "bracelet",
+          "value_multiplier": 1.3
+        },
+        "3": {
+          "name": "watch",
+          "value_multiplier": 2.0
+        },
+        "4": {
+          "name": "earring",
+          "value_multiplier": 1.1
+        },
+        "5": {
+          "name": "precious_stone",
+          "value_multiplier": 3.0
+        }
+      }
+    }
+  }
+}

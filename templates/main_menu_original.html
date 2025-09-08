@@ -181,12 +181,6 @@
                         0 0 20px rgba(244, 67, 54, 0.3);
         }
 
-        .scenario-manager:hover {
-            border-color: #FFD700;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3),
-                        0 0 20px rgba(255, 215, 0, 0.3);
-        }
-
         .settings:hover {
             border-color: #9C27B0;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3),
@@ -361,16 +355,7 @@
                     </div>
                 </div>
 
-                <!-- Sezione 5: Scenario Manager (NUOVA) -->
-                <div class="menu-item scenario-manager" onclick="navigateToSection('scenario_manager')">
-                    <span class="icon">💎</span>
-                    <div class="content">
-                        <h3>Scenario Manager</h3>
-                        <p>Configurazione avanzata scenari di detection, gestione target multipli e AI personalizzata</p>
-                    </div>
-                </div>
-
-                <!-- Sezione 6: Settings -->
+                <!-- Sezione 5: Settings -->
                 <div class="menu-item settings" onclick="navigateToSection('settings')">
                     <span class="icon">⚙️</span>
                     <div class="content">
@@ -424,9 +409,6 @@
                     case 'monitoring':
                         window.location.href = '/monitoring';
                         break;
-                    case 'scenario_manager':
-                        window.location.href = '/scenario_manager';
-                        break;
                     case 'settings':
                         window.location.href = '/settings';
                         break;
@@ -447,49 +429,25 @@
                 diamond.style.filter = 'drop-shadow(0 0 30px rgba(255, 215, 0, 0.8))';
             }, 500);
 
-            // Mostra info sistema enhanced
-            fetch('/api/system/status')
-                .then(response => response.json())
-                .then(data => {
-                    const status = data.status || {};
-                    const enhanced = status.enhanced_enabled ? 'ATTIVO' : 'BASIC';
-                    const scenario = status.active_scenario || 'N/A';
-                    const targets = status.active_targets ? status.active_targets.join(', ') : 'N/A';
-                    
-                    alert('💎 JEWELRY VISION ENHANCED SYSTEM\n\n' +
-                          'Versione: 2.0 Enhanced\n' +
-                          'Platform: Jetson Orin Nano 8GB\n' +
-                          'AI Engine: YOLO11 + Multi-Target\n' +
-                          `Enhanced Mode: ${enhanced}\n` +
-                          `Scenario Attivo: ${scenario}\n` +
-                          `Target Attivi: ${targets}\n` +
-                          'Features: 6 Moduli Integrati\n\n' +
-                          'Sistema Enhanced pronto per l\'uso!');
-                })
-                .catch(() => {
-                    alert('💎 JEWELRY VISION SYSTEM\n\n' +
-                          'Versione: 2.0 Enhanced\n' +
-                          'Platform: Jetson Orin Nano 8GB\n' +
-                          'AI Engine: YOLO11 + OpenCV\n' +
-                          'Features: 6 Moduli Integrati\n\n' +
-                          'Sistema pronto per l\'uso!');
-                });
+            // Mostra info sistema
+            alert('💎 JEWELRY VISION SYSTEM\n\n' +
+                  'Versione: 2.0 Final\n' +
+                  'Platform: Jetson Orin Nano 8GB\n' +
+                  'AI Engine: YOLO11 + OpenCV\n' +
+                  'Features: 5 Moduli Integrati\n\n' +
+                  'Sistema pronto per l\'uso!');
         }
 
         // Aggiorna status bar ogni 5 secondi
         async function updateSystemStatus() {
             try {
-                const response = await fetch('/api/system/status');
+                const response = await fetch('/api/status');
                 const data = await response.json();
-                const status = data.status || {};
                 
-                // Update camera status
                 document.getElementById('camera-status').textContent = 
-                    status.camera_connected ? 'Camera Active' : 'Camera Ready';
-                
-                // Update AI status
-                const aiStatus = status.enhanced_enabled ? 'Enhanced AI' : 'Basic AI';
-                document.getElementById('ai-status').textContent = aiStatus;
+                    data.camera_user ? `${data.camera_user} Active` : 'Ready';
+                document.getElementById('ai-status').textContent = 
+                    data.yolo_available ? 'AI Ready' : 'AI Loading';
                 
                 // Simula carico sistema
                 const cpu = Math.floor(Math.random() * 30) + 20;
@@ -499,7 +457,6 @@
             } catch (error) {
                 console.log('Status update error:', error);
                 document.getElementById('camera-status').textContent = 'Offline';
-                document.getElementById('ai-status').textContent = 'AI Loading';
             }
         }
 
