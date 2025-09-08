@@ -23,14 +23,6 @@ import threading
 import psutil
 import signal
 import numpy as np
-# Import del modulo jewelry
-try:
-    from jewelry_integration_module import JewelryIntegrationModule
-    JEWELRY_MODULE_AVAILABLE = True
-    print("✅ Jewelry Integration Module importato")
-except ImportError as e:
-    JEWELRY_MODULE_AVAILABLE = False
-    print(f"⚠️ Jewelry Module non disponibile: {e}")
 
 # Gestione import OpenCV
 try:
@@ -732,27 +724,6 @@ def api_monitoring_status():
         'stats': jewelry_vision.system_stats,
         'timestamp': time.time()
     })
-# ======================
-# JEWELRY ROUTES
-# ======================
-
-@app.route('/jewelry_monitoring')
-def jewelry_monitoring():
-    return render_template('jewelry_monitoring.html')
-
-@app.route('/api/jewelry/start_tracking', methods=['POST'])
-def start_jewelry_tracking():
-    if hasattr(jewelry_vision, 'jewelry_module') and jewelry_vision.jewelry_module:
-        result = jewelry_vision.jewelry_module.start_jewelry_tracking()
-        return jsonify(result)
-    return jsonify({"status": "error", "message": "Jewelry module non disponibile"})
-
-@app.route('/api/jewelry/status', methods=['GET'])
-def get_jewelry_status():
-    if hasattr(jewelry_vision, 'jewelry_module') and jewelry_vision.jewelry_module:
-        status = jewelry_vision.jewelry_module.get_jewelry_status()
-        return jsonify(status)
-    return jsonify({"status": "error", "message": "Jewelry module non disponibile"})
 
 if __name__ == '__main__':
     # Registra handler per cleanup

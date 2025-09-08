@@ -1,0 +1,33 @@
+{
+    "model": {
+        "name": "yolo11n.pt",
+        "confidence_threshold": 0.5,
+        "device": "cuda"
+    },
+    "jewelry_classes": {
+        "0": "person",
+        "24": "handbag",
+        "26": "backpack", 
+        "28": "suitcase",
+        "80": "ring",
+        "81": "necklace",
+        "82": "bracelet",
+        "83": "earrings",
+        "84": "watch",
+        "85": "brooch"
+    },
+    "tracking": {
+        "grid_size": [10, 10],
+        "position_tolerance": 50,
+        "confidence_threshold": 0.3,
+        "missing_timeout": 5.0
+    },
+    "alerts": {
+        "missing_item": true,
+        "new_item": true,
+        "low_confidence": true,
+        "movement": true,
+        "person_detected": true
+    },
+    "auto_start_tracking": false
+}
