@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💎 Jewelry Vision - Scenario Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 0;
+            border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.8;
+        }
+
+
+
+
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-tab {
+            padding: 15px 30px;
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-tab:hover {
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .nav-tab.active {
+            border-bottom-color: #ffd700;
+            background: rgba(255, 215, 0, 0.15);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2);
+        }
+
+        .scenario-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .scenario-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scenario-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .scenario-card:hover::before {
+            left: 100%;
+        }
+
+        .scenario-card:hover {
+            transform: translateY(-5px);
+            border-color: #ffd700;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+        }
+
+        .scenario-card.active {
+            border-color: #ffd700;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 215, 0, 0.1) 100%);
+        }
+
+        .scenario-title {
+            font-size: 1.4em;
+            margin-bottom: 10px;
+            color: #ffd700;
+        }
+
+        .scenario-description {
+            margin-bottom: 15px;
+            opacity: 0.8;
+            line-height: 1.5;
+        }
+
+        .scenario-targets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .target-tag {
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .scenario-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .status-active {
+            background: #28a745;
+            color: white;
+        }
+
+        .status-inactive {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #1a1a2e;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #ff4757, #ff6b7a);
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            font-size: 1em;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #ffd700;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .checkbox-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #ffd700;
+        }
+
+        .wizard-steps {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .wizard-step {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            margin: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .wizard-step.completed {
+            background: rgba(40, 167, 69, 0.3);
+            color: #28a745;
+        }
+
+        .wizard-step.active {
+            background: rgba(255, 215, 0, 0.3);
+            color: #ffd700;
+        }
+
+        .wizard-step.disabled {
+            opacity: 0.5;
+        }
+
+        .database-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .database-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .database-card:hover {
+            border-color: #ffd700;
+            transform: translateY(-3px);
+        }
+
+        .database-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .database-name {
+            font-size: 1.2em;
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .database-cost {
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+        }
+
+        .pros-cons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .pros, .cons {
+            list-style: none;
+            padding: 0;
+        }
+
+        .pros li::before {
+            content: "✅ ";
+            margin-right: 5px;
+        }
+
+        .cons li::before {
+            content: "⚠️ ";
+            margin-right: 5px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 15px;
+        }
+
+        .modal-title {
+            font-size: 1.5em;
+            color: #ffd700;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: #ffd700;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+        }
+
+        .alert-success {
+            background: rgba(40, 167, 69, 0.2);
+            border-color: #28a745;
+            color: #28a745;
+        }
+
+        .alert-error {
+            background: rgba(220, 53, 69, 0.2);
+            border-color: #dc3545;
+            color: #dc3545;
+        }
+
+        .alert-info {
+            background: rgba(23, 162, 184, 0.2);
+            border-color: #17a2b8;
+            color: #17a2b8;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid #ffd700;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .nav-tabs {
+                flex-wrap: wrap;
+            }
+
+            .nav-tab {
+                padding: 10px 15px;
+                font-size: 1em;
+            }
+
+            .scenario-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .checkbox-group {
+                grid-template-columns: 1fr;
+            }
+
+            .wizard-steps {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .pros-cons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💎 Jewelry Vision - Scenario Manager</h1>
+            <p>Configurazione Intelligente per Detection Multi-Target</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('dashboard')">📊 Dashboard</button>
+            <button class="nav-tab" onclick="showTab('scenarios')">🎭 Scenari</button>
+            <button class="nav-tab" onclick="showTab('wizard')">🧙‍♂️ Wizard</button>
+            <button class="nav-tab" onclick="showTab('databases')">🗄️ Database</button>
+            <button class="nav-tab" onclick="showTab('settings')">⚙️ Impostazioni</button>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="activeScenario">-</div>
+                    <div class="stat-label">Scenario Attivo</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="activeTargets">0</div>
+                    <div class="stat-label">Target Attivi</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalDetections">0</div>
+                    <div class="stat-label">Detection Totali</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="systemStatus">🔴</div>
+                    <div class="stat-label">Stato Sistema</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>🎯 Stato Attuale Sistema</h3>
+                <div id="currentStatus">
+                    <p>Caricamento stato sistema...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <button class="btn" onclick="refreshStatus()">🔄 Aggiorna Stato</button>
+                    <button class="btn btn-secondary" onclick="showTab('scenarios')">📝 Cambia Scenario</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>📈 Statistiche Detection</h3>
+                <div id="detectionStats">
+                    <p>Nessuna statistica disponibile</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scenari Tab -->
+        <div id="scenarios" class="tab-content">
+            <div class="card">
+                <h3>🎭 Scenari Predefiniti</h3>
+                <p>Seleziona uno scenario predefinito per il tuo caso d'uso specifico</p>
+                
+                <div class="scenario-grid" id="predefinedScenarios">
+                    <!-- Scenarios will be loaded here -->
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>✨ Scenari Personalizzati</h3>
+                <p>I tuoi scenari creati su misura</p>
+                
+                <div class="scenario-grid" id="customScenarios">
+                    <div class="scenario-card" onclick="showWizard()" style="border: 2px dashed rgba(255, 215, 0, 0.5); text-align: center; display: flex; align-items: center; justify-content: center; flex-direction: column; min-height: 200px;">
+                        <div style="font-size: 3em; margin-bottom: 15px;">➕</div>
+                        <div class="scenario-title">Crea Nuovo Scenario</div>
+                        <div class="scenario-description">Usa il wizard per creare un scenario personalizzato</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wizard Tab -->
+        <div id="wizard" class="tab-content">
+            <div class="wizard-steps" id="wizardSteps">
+                <div class="wizard-step active">1. Info Base</div>
+                <div class="wizard-step disabled">2. Location</div>
+                <div class="wizard-step disabled">3. Sicurezza</div>
+                <div class="wizard-step disabled">4. Target</div>
+                <div class="wizard-step disabled">5. Database</div>
+                <div class="wizard-step disabled">6. Regole</div>
+                <div class="wizard-step disabled">7. Review</div>
+            </div>
+
+            <div class="card">
+                <div id="wizardContent">
+                    <!-- Wizard content will be loaded here -->
+                    <h3>🧙‍♂️ Creazione Guidata Scenario</h3>
+                    <p>Benvenuto nel wizard di creazione scenario! Ti guideremo passo dopo passo per creare la configurazione perfetta per le tue esigenze.</p>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Nome Scenario</label>
+                        <input type="text" class="form-input" id="scenarioName" placeholder="Es: Sicurezza Gioielleria Centrale">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Descrizione</label>
+                        <textarea class="form-input" id="scenarioDescription" rows="3" placeholder="Descrivi brevemente il tuo scenario..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Tipo Scenario</label>
+                        <select class="form-input" id="scenarioType">
+                            <option value="security">🔒 Sicurezza</option>
+                            <option value="analytics">📊 Analytics</option>
+                            <option value="inventory">📦 Inventory</option>
+                            <option value="access_control">🚪 Controllo Accessi</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 30px; text-align: center;">
+                    <button class="btn btn-secondary" onclick="resetWizard()">↩️ Reset</button>
+                    <button class="btn" onclick="nextWizardStep()">Avanti ➡️</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Database Tab -->
+        <div id="databases" class="tab-content">
+            <div class="card">
+                <h3>🗄️ Database di Detection Disponibili</h3>
+                <p>Confronta le opzioni disponibili per i tuoi modelli di detection</p>
+            </div>
+
+            <div class="database-grid" id="databaseGrid">
+                <!-- Database cards will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div id="settings" class="tab-content">
+            <div class="card">
+                <h3>⚙️ Impostazioni Sistema</h3>
+                
+                <div class="form-group">
+                    <label class="form-label">Confidence Threshold Globale</label>
+                    <input type="range" class="form-input" id="globalConfidence" min="0.1" max="1.0" step="0.1" value="0.5">
+                    <span id="confidenceValue">0.5</span>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Intervallo Detection (frame)</label>
+                    <input type="number" class="form-input" id="detectionInterval" value="3" min="1" max="10">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Salvataggio Automatico</label>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="autoSave" checked>
+                        <label>Salva automaticamente le detection</label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Directory Output</label>
+                    <input type="text" class="form-input" id="outputDir" value="captures/multi_target">
+                </div>
+                
+                <button class="btn" onclick="saveSettings()">💾 Salva Impostazioni</button>
+            </div>
+
+            <div class="card">
+                <h3>📱 Integrazione Sistema</h3>
+                <p>Stato integrazione con jewelry_vision_web.py</p>
+                
+                <div id="integrationStatus">
+                    <div class="alert alert-info">
+                        ✅ Sistema pronto per l'integrazione<br>
+                        📍 File da modificare: jewelry_vision_web.py<br>
+                        🔧 Status: Compatibile
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="generateIntegrationCode()">📝 Genera Codice Integrazione</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Modal Title</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modalBody">
+                <!-- Modal content goes here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <p>Caricamento in corso...</p>
+    </div>
+
+    <script>
+        // State management
+        let currentTab = 'dashboard';
+        let wizardStep = 0;
+        let wizardData = {};
+        let systemStatus = {};
+
+        // Mock data for demonstration
+        const predefinedScenarios = {
+            'jewelry_security': {
+                name: 'Sicurezza Gioielleria',
+                description: 'Monitoraggio completo per gioiellerie con detection persone e gioielli',
+                targets: ['people', 'jewelry'],
+                active: true
+            },
+            'art_gallery': {
+                name: 'Galleria Arte',
+                description: 'Controllo visitatori e protezione opere d\'arte',
+                targets: ['people', 'artwork', 'bags'],
+                active: false
+            },
+            'facial_recognition': {
+                name: 'Riconoscimento Facciale',
+                description: 'Sistema di accesso con riconoscimento facciale',
+                targets: ['faces', 'people'],
+                active: false
+            },
+            'suspicious_activity': {
+                name: 'Attività Sospette',
+                description: 'Rilevamento comportamenti e oggetti sospetti',
+                targets: ['people', 'bags', 'weapons'],
+                active: false
+            }
+        };
+
+        const databases = {
+            'ultralytics': {
+                name: 'Ultralytics Hub',
+                description: 'Modelli pre-addestrati gratuiti',
+                cost: 'Gratuito',
+                pros: ['Veloce', 'Affidabile', 'Supporto CUDA'],
+                cons: ['Classi limitate', 'Non personalizzabile']
+            },
+            'roboflow': {
+                name: 'Roboflow Universe',
+                description: 'Database comunitario specializzato',
+                cost: 'Freemium',
+                pros: ['Varietà modelli', 'Specializzati', 'Community'],
+                cons: ['Qualità variabile', 'Internet richiesto']
+            },
+            'local': {
+                name: 'Database Locale',
+                description: 'Modelli custom addestrati localmente',
+                cost: 'Gratuito',
+                pros: ['Personalizzazione totale', 'Privacy', 'Offline'],
+                cons: ['Richiede training', 'Maintenance']
+            }
+        };
+
+        // Tab management
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active from all nav tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            currentTab = tabName;
+            
+            // Load tab content
+            loadTabContent(tabName);
+        }
+
+        function loadTabContent(tabName) {
+            switch(tabName) {
+                case 'dashboard':
+                    loadDashboard();
+                    break;
+                case 'scenarios':
+                    loadScenarios();
+                    break;
+                case 'databases':
+                    loadDatabases();
+                    break;
+            }
+        }
+
+        function loadDashboard() {
+            // Update stats
+            document.getElementById('activeScenario').textContent = 'Jewelry Security';
+            document.getElementById('activeTargets').textContent = '2';
+            document.getElementById('totalDetections').textContent = '47';
+            document.getElementById('systemStatus').textContent = '🟢';
+
+            // Update current status
+            const statusHtml = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                    <div>
+                        <strong>📋 Scenario Attivo:</strong><br>
+                        Jewelry Security
+                    </div>
+                    <div>
+                        <strong>🎯 Target Attivi:</strong><br>
+                        People, Jewelry
+                    </div>
+                    <div>
+                        <strong>🤖 Modelli Caricati:</strong><br>
+                        2/2 modelli pronti
+                    </div>
+                    <div>
+                        <strong>⏰ Ultima Detection:</strong><br>
+                        ${new Date().toLocaleTimeString()}
+                    </div>
+                </div>
+            `;
+            document.getElementById('currentStatus').innerHTML = statusHtml;
+
+            // Update detection stats
+            const statsHtml = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div class="stat-card">
+                        <div class="stat-number">23</div>
+                        <div class="stat-label">Detection Persone</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">8</div>
+                        <div class="stat-label">Detection Gioielli</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">2</div>
+                        <div class="stat-label">Alert Alto Valore</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">95%</div>
+                        <div class="stat-label">Confidence Media</div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('detectionStats').innerHTML = statsHtml;
+        }
+
+        function loadScenarios() {
+            const predefinedContainer = document.getElementById('predefinedScenarios');
+            predefinedContainer.innerHTML = '';
+
+            Object.entries(predefinedScenarios).forEach(([key, scenario]) => {
+                const scenarioCard = createScenarioCard(key, scenario);
+                predefinedContainer.appendChild(scenarioCard);
+            });
+        }
+
+        function createScenarioCard(key, scenario) {
+            const card = document.createElement('div');
+            card.className = `scenario-card ${scenario.active ? 'active' : ''}`;
+            card.onclick = () => activateScenario(key);
+            
+            card.innerHTML = `
+                <div class="scenario-title">${scenario.name}</div>
+                <div class="scenario-description">${scenario.description}</div>
+                <div class="scenario-targets">
+                    ${scenario.targets.map(target => `<span class="target-tag">${target}</span>`).join('')}
+                </div>
+                <div class="scenario-status">
+                    <span class="status-badge ${scenario.active ? 'status-active' : 'status-inactive'}">
+                        ${scenario.active ? '✅ Attivo' : '⭕ Inattivo'}
+                    </span>
+                    <button class="btn" onclick="event.stopPropagation(); configureScenario('${key}')">
+                        ⚙️ Configura
+                    </button>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function loadDatabases() {
+            const databaseContainer = document.getElementById('databaseGrid');
+            databaseContainer.innerHTML = '';
+
+            Object.entries(databases).forEach(([key, db]) => {
+                const dbCard = createDatabaseCard(key, db);
+                databaseContainer.appendChild(dbCard);
+            });
+        }
+
+        function createDatabaseCard(key, db) {
+            const card = document.createElement('div');
+            card.className = 'database-card';
+            
+            card.innerHTML = `
+                <div class="database-header">
+                    <div class="database-name">${db.name}</div>
+                    <div class="database-cost">${db.cost}</div>
+                </div>
+                <div class="scenario-description">${db.description}</div>
+                <div class="pros-cons">
+                    <div>
+                        <h4 style="color: #28a745; margin-bottom: 10px;">✅ Vantaggi</h4>
+                        <ul class="pros">
+                            ${db.pros.map(pro => `<li>${pro}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 style="color: #ffc107; margin-bottom: 10px;">⚠️ Limitazioni</h4>
+                        <ul class="cons">
+                            ${db.cons.map(con => `<li>${con}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+                <div style="margin-top: 15px; text-align: center;">
+                    <button class="btn" onclick="selectDatabase('${key}')">📥 Seleziona</button>
+                    <button class="btn btn-secondary" onclick="testDatabase('${key}')">🧪 Test</button>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Scenario management
+        function activateScenario(scenarioKey) {
+            showLoading();
+            
+            // Simulate API call
+            setTimeout(() => {
+                // Update all scenarios to inactive
+                Object.keys(predefinedScenarios).forEach(key => {
+                    predefinedScenarios[key].active = false;
+                });
+                
+                // Activate selected scenario
+                predefinedScenarios[scenarioKey].active = true;
+                
+                hideLoading();
+                showAlert(`Scenario "${predefinedScenarios[scenarioKey].name}" attivato con successo!`, 'success');
+                loadScenarios();
+                loadDashboard();
+            }, 1500);
+        }
+
+        function configureScenario(scenarioKey) {
+            const scenario = predefinedScenarios[scenarioKey];
+            showModal('Configura Scenario', `
+                <div class="form-group">
+                    <label class="form-label">Nome Scenario</label>
+                    <input type="text" class="form-input" value="${scenario.name}" id="editScenarioName">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Descrizione</label>
+                    <textarea class="form-input" rows="3" id="editScenarioDescription">${scenario.description}</textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Target Attivi</label>
+                    <div class="checkbox-group">
+                        ${['people', 'jewelry', 'faces', 'bags', 'weapons', 'vehicles'].map(target => `
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="target_${target}" ${scenario.targets.includes(target) ? 'checked' : ''}>
+                                <label>${target}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                <div style="margin-top: 20px; text-align: center;">
+                    <button class="btn" onclick="saveScenarioConfig('${scenarioKey}')">💾 Salva Modifiche</button>
+                    <button class="btn btn-secondary" onclick="closeModal()">❌ Annulla</button>
+                </div>
+            `);
+        }
+
+        function saveScenarioConfig(scenarioKey) {
+            const name = document.getElementById('editScenarioName').value;
+            const description = document.getElementById('editScenarioDescription').value;
+            const targets = [];
+            
+            ['people', 'jewelry', 'faces', 'bags', 'weapons', 'vehicles'].forEach(target => {
+                if (document.getElementById(`target_${target}`).checked) {
+                    targets.push(target);
+                }
+            });
+
+            predefinedScenarios[scenarioKey].name = name;
+            predefinedScenarios[scenarioKey].description = description;
+            predefinedScenarios[scenarioKey].targets = targets;
+
+            closeModal();
+            showAlert('Configurazione salvata con successo!', 'success');
+            loadScenarios();
+        }
+
+        // Wizard management
+        function showWizard() {
+            showTab('wizard');
+            resetWizard();
+        }
+
+        function resetWizard() {
+            wizardStep = 0;
+            wizardData = {};
+            updateWizardSteps();
+            loadWizardStep(0);
+        }
+
+        function nextWizardStep() {
+            // Save current step data
+            saveWizardStepData();
+            
+            if (wizardStep < 6) {
+                wizardStep++;
+                updateWizardSteps();
+                loadWizardStep(wizardStep);
+            } else {
+                // Final step - create scenario
+                createScenarioFromWizard();
+            }
+        }
+
+        function saveWizardStepData() {
+            switch(wizardStep) {
+                case 0: // Basic info
+                    wizardData.name = document.getElementById('scenarioName').value;
+                    wizardData.description = document.getElementById('scenarioDescription').value;
+                    wizardData.type = document.getElementById('scenarioType').value;
+                    break;
+                // Add other steps as needed
+            }
+        }
+
+        function updateWizardSteps() {
+            const steps = document.querySelectorAll('.wizard-step');
+            steps.forEach((step, index) => {
+                step.classList.remove('active', 'completed', 'disabled');
+                
+                if (index < wizardStep) {
+                    step.classList.add('completed');
+                } else if (index === wizardStep) {
+                    step.classList.add('active');
+                } else {
+                    step.classList.add('disabled');
+                }
+            });
+        }
+
+        function loadWizardStep(step) {
+            const content = document.getElementById('wizardContent');
+            
+            switch(step) {
+                case 1: // Location type
+                    content.innerHTML = `
+                        <h3>📍 Tipo di Location</h3>
+                        <p>Seleziona il tipo di ambiente da monitorare</p>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Tipo Location</label>
+                            <select class="form-input" id="locationType">
+                                <option value="jewelry_store">💎 Gioielleria</option>
+                                <option value="art_gallery">🎨 Galleria d'Arte</option>
+                                <option value="retail">🏪 Negozio</option>
+                                <option value="office">🏢 Ufficio</option>
+                                <option value="warehouse">📦 Magazzino</option>
+                                <option value="parking">🚗 Parcheggio</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Dimensione Area</label>
+                            <select class="form-input" id="areaSize">
+                                <option value="small">Piccola (< 50 mq)</option>
+                                <option value="medium">Media (50-200 mq)</option>
+                                <option value="large">Grande (> 200 mq)</option>
+                            </select>
+                        </div>
+                    `;
+                    break;
+                    
+                case 2: // Security concerns
+                    content.innerHTML = `
+                        <h3>🔒 Preoccupazioni di Sicurezza</h3>
+                        <p>Seleziona le tue principali preoccupazioni (selezione multipla)</p>
+                        
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="concern_theft">
+                                <label>🦹‍♂️ Prevenzione Furti</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="concern_access">
+                                <label>🚪 Controllo Accessi</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="concern_weapons">
+                                <label>🔫 Rilevamento Armi</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="concern_crowd">
+                                <label>👥 Controllo Folla</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="concern_vehicles">
+                                <label>🚗 Sicurezza Veicoli</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="concern_inventory">
+                                <label>📦 Tracciamento Inventory</label>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 3: // Target selection
+                    content.innerHTML = `
+                        <h3>🎯 Selezione Target</h3>
+                        <p>Scegli cosa vuoi rilevare (suggerimenti basati sulle tue risposte)</p>
+                        
+                        <div class="alert alert-info">
+                            💡 <strong>Suggerimento:</strong> Basato sulle tue risposte, ti consigliamo: People, Jewelry
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="target_people" checked>
+                                <label>👤 Persone</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="target_jewelry" checked>
+                                <label>💎 Gioielli</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="target_faces">
+                                <label>😊 Volti</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="target_bags">
+                                <label>👜 Borse</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="target_weapons">
+                                <label>🔫 Armi</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="target_vehicles">
+                                <label>🚗 Veicoli</label>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                default:
+                    // Keep original step 0 content
+                    break;
+            }
+        }
+
+        function createScenarioFromWizard() {
+            showLoading();
+            
+            setTimeout(() => {
+                const scenarioName = wizardData.name || 'Scenario Personalizzato';
+                const newScenarioKey = scenarioName.toLowerCase().replace(/\s+/g, '_');
+                
+                predefinedScenarios[newScenarioKey] = {
+                    name: scenarioName,
+                    description: wizardData.description || 'Scenario creato tramite wizard',
+                    targets: ['people', 'jewelry'], // This would come from wizard data
+                    active: false
+                };
+                
+                hideLoading();
+                showAlert(`Scenario "${scenarioName}" creato con successo!`, 'success');
+                showTab('scenarios');
+                loadScenarios();
+            }, 2000);
+        }
+
+        // Database management
+        function selectDatabase(dbKey) {
+            showAlert(`Database "${databases[dbKey].name}" selezionato!`, 'success');
+        }
+
+        function testDatabase(dbKey) {
+            showLoading();
+            
+            setTimeout(() => {
+                hideLoading();
+                showAlert(`Test completato per "${databases[dbKey].name}" - Connessione riuscita!`, 'success');
+            }, 2000);
+        }
+
+        // Settings management
+        function saveSettings() {
+            const confidence = document.getElementById('globalConfidence').value;
+            const interval = document.getElementById('detectionInterval').value;
+            const autoSave = document.getElementById('autoSave').checked;
+            const outputDir = document.getElementById('outputDir').value;
+            
+            showAlert('Impostazioni salvate con successo!', 'success');
+        }
+
+        function generateIntegrationCode() {
+            showModal('Codice di Integrazione', `
+                <div class="alert alert-info">
+                    📋 Copia questo codice nel tuo jewelry_vision_web.py
+                </div>
+                <pre style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; overflow-x: auto; color: #00ff00; font-family: monospace;">
+# Aggiungi all'inizio del file
+from multi_target_detection import MultiTargetDetectionSystem
+
+# Nell'inizializzazione
+detection_system = MultiTargetDetectionSystem()
+detection_system.set_active_scenario('jewelry_security')
+
+# Nel loop di detection
+results = detection_system.detect_frame(frame)
+annotated_frame = detection_system._draw_multi_target_detections(frame, results)
+                </pre>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn" onclick="copyToClipboard()">📋 Copia Codice</button>
+                </div>
+            `);
+        }
+
+        // Utility functions
+        function showModal(title, content) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalBody').innerHTML = content;
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        function showAlert(message, type = 'info') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.innerHTML = message;
+            
+            // Insert at the top of current tab
+            const currentTabContent = document.querySelector('.tab-content.active');
+            currentTabContent.insertBefore(alertDiv, currentTabContent.firstChild);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.parentNode.removeChild(alertDiv);
+                }
+            }, 5000);
+        }
+
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function refreshStatus() {
+            showLoading();
+            setTimeout(() => {
+                hideLoading();
+                loadDashboard();
+                showAlert('Stato sistema aggiornato!', 'success');
+            }, 1000);
+        }
+
+        function copyToClipboard() {
+            // This would copy the integration code to clipboard
+            showAlert('Codice copiato negli appunti!', 'success');
+        }
+
+        // Event listeners
+        document.getElementById('globalConfidence').addEventListener('input', function() {
+            document.getElementById('confidenceValue').textContent = this.value;
+        });
+
+        // Click outside modal to close
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTabContent('dashboard');
+            
+            // Simulate real-time updates
+            setInterval(() => {
+                if (currentTab === 'dashboard') {
+                    const detections = parseInt(document.getElementById('totalDetections').textContent);
+                    if (Math.random() > 0.7) { // 30% chance of new detection
+                        document.getElementById('totalDetections').textContent = detections + 1;
+                    }
+                }
+            }, 5000);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+{
+  "detection_results": {
+    "timestamp": "2025-09-08T23:58:35.832312",
+    "scenario": "jewelry_security",
+    "frame_shape": [
+      480,
+      640,
+      3
+    ],
+    "detections_by_target": {
+      "people": [
+        {
+          "target": "people",
+          "class_id": 62,
+          "class_name": "object_62",
+          "confidence": 0.8632262945175171,
+          "bbox": [
+            391.7766418457031,
+            74.15277099609375,
+            639.280517578125,
+            283.743896484375
+          ],
+          "timestamp": "2025-09-08T23:58:38.158974"
+        }
+      ]
+    },
+    "alerts": [
+      {
+        "target": "people",
+        "detection": {
+          "target": "people",
+          "class_id": 62,
+          "class_name": "object_62",
+          "confidence": 0.8632262945175171,
+          "bbox": [
+            391.7766418457031,
+            74.15277099609375,
+            639.280517578125,
+            283.743896484375
+          ],
+          "timestamp": "2025-09-08T23:58:38.158974"
+        },
+        "conditions": [
+          "high_confidence",
+          "person_detected"
+        ],
+        "priority": "high",
+        "timestamp": "2025-09-08T23:58:38.159455",
+        "scenario": "jewelry_security"
+      }
+    ],
+    "summary": {
+      "total_detections": 1,
+      "targets_detected": 1,
+      "high_priority_alerts": 1,
+      "active_targets": 1
+    }
+  },
+  "system_status": {
+    "active_scenario": "jewelry_security",
+    "active_targets": [
+      "people"
+    ],
+    "loaded_models": [
+      "people"
+    ],
+    "available_targets": [
+      "people",
+      "jewelry"
+    ],
+    "detection_stats": {
+      "people": {
+        "total_detections": 1,
+        "last_detection": "2025-09-08T23:58:35.832312",
+        "avg_confidence": 0.8632262945175171
+      }
+    },
+    "models_ready": true
+  },
+  "image_path": "captures/multi_target/detection_20250908_235838_160.jpg"
+}
