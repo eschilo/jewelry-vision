@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jewelry Vision - Enhanced Panel</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .panel {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .status-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .status-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        
+        .status-on { background-color: #4CAF50; }
+        .status-off { background-color: #f44336; }
+        .status-warning { background-color: #FF9800; }
+        
+        .btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(45deg, #f44336, #da190b);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(45deg, #FF9800, #e68900);
+        }
+        
+        .info-box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .navigation {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            padding: 8px 16px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+        
+        #systemStatus {
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .component-status {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🔍 Jewelry Vision Enhanced Panel</h1>
+            <p>Sistema di controllo avanzato - Step 1 Integration</p>
+        </div>
+        
+        <!-- Navigation -->
+        <div class="navigation">
+            <a href="/" class="nav-link">🏠 Home</a>
+            <a href="/scenario_manager" class="nav-link">⚙️ Scenario Manager</a>
+            <a href="/enhanced_panel" class="nav-link">🚀 Enhanced Panel</a>
+        </div>
+        
+        <!-- Status Panel -->
+        <div class="panel">
+            <h2>📊 System Status</h2>
+            
+            <div class="status-grid">
+                <div class="status-card">
+                    <h3>Base System</h3>
+                    <div id="baseStatus">
+                        <span class="status-indicator status-warning"></span>
+                        Loading...
+                    </div>
+                </div>
+                
+                <div class="status-card">
+                    <h3>Enhanced Mode</h3>
+                    <div id="enhancedStatus">
+                        <span class="status-indicator status-off"></span>
+                        Disabled
+                    </div>
+                </div>
+                
+                <div class="status-card">
+                    <h3>Components</h3>
+                    <div id="componentsStatus">
+                        <span class="status-indicator status-warning"></span>
+                        Checking...
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Enhanced Controls -->
+        <div class="panel">
+            <h2>🚀 Enhanced Controls</h2>
+            
+            <div style="text-align: center; margin: 20px 0;">
+                <button class="btn" onclick="toggleEnhanced()">
+                    <span id="enhancedToggleText">Enable Enhanced Mode</span>
+                </button>
+                <button class="btn btn-warning" onclick="refreshStatus()">
+                    🔄 Refresh Status
+                </button>
+            </div>
+            
+            <div class="info-box">
+                <strong>ℹ️ Step 1 Integration:</strong><br>
+                Questa versione aggiunge solo il framework enhanced di base senza modificare il sistema esistente.
+                Il video streaming e la detection YOLO rimangono completamente invariati.
+            </div>
+        </div>
+        
+        <!-- System Information -->
+        <div class="panel">
+            <h2>🔧 System Information</h2>
+            <div id="systemStatus" class="component-status">
+                Loading system information...
+            </div>
+        </div>
+        
+        <!-- Debug Panel -->
+        <div class="panel">
+            <h2>🐛 Debug Information</h2>
+            <div style="font-family: monospace; font-size: 12px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px;">
+                <div><strong>Version:</strong> Enhanced Step 1</div>
+                <div><strong>Mode:</strong> Gradual Integration</div>
+                <div><strong>Video Stream:</strong> Original (Unchanged)</div>
+                <div><strong>Detection:</strong> YOLO11 (Unchanged)</div>
+                <div><strong>New Features:</strong> Enhanced Framework Only</div>
+                <div id="debugInfo"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let enhancedMode = false;
+        
+        // Load status on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshStatus();
+            setInterval(refreshStatus, 5000); // Auto-refresh every 5 seconds
+        });
+        
+        async function refreshStatus() {
+            try {
+                // Get base system status
+                const baseResponse = await fetch('/status');
+                const baseStatus = await baseResponse.json();
+                updateBaseStatus(baseStatus);
+                
+                // Get enhanced system status  
+                const enhancedResponse = await fetch('/enhanced_status');
+                const enhancedStatus = await enhancedResponse.json();
+                updateEnhancedStatus(enhancedStatus);
+                
+                // Get detailed info
+                const infoResponse = await fetch('/enhanced_info');
+                const systemInfo = await infoResponse.json();
+                updateSystemInfo(systemInfo);
+                
+            } catch (error) {
+                console.error('Error fetching status:', error);
+                document.getElementById('debugInfo').innerHTML = 
+                    '<div style="color: #f44336;">⚠️ Error: ' + error.message + '</div>';
+            }
+        }
+        
+        function updateBaseStatus(status) {
+            const baseStatusEl = document.getElementById('baseStatus');
+            const isRunning = status.camera_running && status.model_loaded;
+            
+            if (isRunning) {
+                baseStatusEl.innerHTML = 
+                    '<span class="status-indicator status-on"></span>Running';
+            } else {
+                baseStatusEl.innerHTML = 
+                    '<span class="status-indicator status-off"></span>Stopped';
+            }
+        }
+        
+        function updateEnhancedStatus(status) {
+            const enhancedStatusEl = document.getElementById('enhancedStatus');
+            const componentsStatusEl = document.getElementById('componentsStatus');
+            
+            enhancedMode = status.enhanced_mode;
+            
+            if (enhancedMode) {
+                enhancedStatusEl.innerHTML = 
+                    '<span class="status-indicator status-on"></span>Enabled';
+                document.getElementById('enhancedToggleText').textContent = 'Disable Enhanced Mode';
+            } else {
+                enhancedStatusEl.innerHTML = 
+                    '<span class="status-indicator status-off"></span>Disabled';
+                document.getElementById('enhancedToggleText').textContent = 'Enable Enhanced Mode';
+            }
+            
+            // Update components status
+            const multiTarget = status.multi_target_available;
+            const scenarioConf = status.scenario_configurator_available;
+            
+            let componentText = '';
+            if (multiTarget && scenarioConf) {
+                componentText = '<span class="status-indicator status-on"></span>Ready';
+            } else if (multiTarget || scenarioConf) {
+                componentText = '<span class="status-indicator status-warning"></span>Partial';
+            } else {
+                componentText = '<span class="status-indicator status-off"></span>Missing';
+            }
+            
+            componentsStatusEl.innerHTML = componentText;
+        }
+        
+        function updateSystemInfo(info) {
+            const statusEl = document.getElementById('systemStatus');
+            const debugEl = document.getElementById('debugInfo');
+            
+            let html = '<strong>Enhanced System Status:</strong><br>';
+            html += 'Mode: ' + (info.system_status.enhanced_mode ? 'ON' : 'OFF') + '<br>';
+            html += 'Multi-Target Available: ' + (info.system_status.multi_target_available ? 'YES' : 'NO') + '<br>';
+            html += 'Scenario Configurator Available: ' + (info.system_status.scenario_configurator_available ? 'YES' : 'NO') + '<br>';
+            html += 'Last Updated: ' + new Date(info.timestamp).toLocaleString() + '<br>';
+            
+            statusEl.innerHTML = html;
+            
+            debugEl.innerHTML = 
+                '<div><strong>Last Check:</strong> ' + new Date().toLocaleString() + '</div>';
+        }
+        
+        async function toggleEnhanced() {
+            try {
+                const response = await fetch('/toggle_enhanced', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ enable: !enhancedMode })
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    enhancedMode = result.enhanced_mode;
+                    refreshStatus(); // Refresh to show updated status
+                } else {
+                    alert('Error: ' + result.message);
+                }
+                
+            } catch (error) {
+                console.error('Error toggling enhanced mode:', error);
+                alert('Error: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
